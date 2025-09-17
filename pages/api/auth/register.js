@@ -1,7 +1,7 @@
 // pages/api/auth/register.js
-import bcrypt from "bcryptjs"
-import User from "../../../models/User"
-import { dbConnect } from "../../../lib/dbConnect"
+const bcrypt = require("bcryptjs")
+const User = require("../../../models/User").default || require("../../../models/User")
+const { dbConnect } = require("../../../lib/dbConnect")
 
 // Enhanced password validation function
 function validatePassword(password) {
@@ -30,7 +30,34 @@ function validatePassword(password) {
   return { isValid, missingRequirements };
 }
 
-export default async function handler(req, res) {
+// Add the missing validateRegistrationData function
+function validateRegistrationData(data) {
+  const errors = []
+
+  if (!data.first_name) errors.push('First name is required')
+  if (!data.last_name) errors.push('Last name is required')
+  if (!data.email) errors.push('Email is required')
+  if (!data.password) errors.push('Password is required')
+
+  if (data.password && data.confirm_password && data.password !== data.confirm_password) {
+    errors.push('Passwords do not match')
+  }
+
+  if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    errors.push('Invalid email format')
+  }
+
+  if (data.password) {
+    const passwordValidation = validatePassword(data.password)
+    if (!passwordValidation.isValid) {
+      errors.push(`Password must contain: ${passwordValidation.missingRequirements.join(', ')}`)
+    }
+  }
+
+  return { isValid: errors.length === 0, errors }
+}
+
+async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" })
   }
@@ -109,3 +136,7 @@ export default async function handler(req, res) {
     res.status(500).json({ error: "Internal server error" })
   }
 }
+
+module.exports = handler
+module.exports.validatePassword = validatePassword
+module.exports.validateRegistrationData = validateRegistrationData
