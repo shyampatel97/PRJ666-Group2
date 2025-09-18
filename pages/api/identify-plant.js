@@ -1,6 +1,6 @@
 // pages/api/identify-plant.js - Updated for NextAuth
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "./auth/[...nextauth]";
+import { authOptions } from "./auth/[...nextauth].js";
 import { dbConnect } from "@/lib/dbConnect";
 import User from '@/models/User';
 import Identification from '@/models/Identification';

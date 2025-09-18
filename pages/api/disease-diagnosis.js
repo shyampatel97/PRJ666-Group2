@@ -1,6 +1,6 @@
 // pages/api/disease-diagnosis.js - Updated for NextAuth consistency
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "./auth/[...nextauth]";
+import { authOptions } from "./auth/[...nextauth].js";
 import { dbConnect } from "@/lib/dbConnect";
 import User from '@/models/User';
 import DiseaseDiagnosis from '@/models/DiseaseDiagnosis';
