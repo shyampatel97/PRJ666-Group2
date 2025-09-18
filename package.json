@@ -10,7 +10,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:integration": "jest --testPathPattern=integration"
+    "test:integration": "jest --testPathPattern=integration",
+    "test:unit": "jest --testPathPattern=unit",
+    "test:verbose": "jest --verbose"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.10.0",
@@ -44,21 +46,49 @@
     "jest-environment-jsdom": "^29.7.0",
     "mongodb-memory-server": "^10.2.1",
     "node-mocks-http": "^1.17.2",
+    "supertest": "^7.1.4",
     "tailwindcss": "^4"
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/$1"
     },
     "transform": {
-      "^.+\\.(js|jsx)$": ["babel-jest", {
-        "presets": [
-          ["@babel/preset-env", { "targets": { "node": "current" } }],
-          "@babel/preset-react"
-        ]
-      }]
-    }
+      "^.+\\.(js|jsx)$": [
+        "babel-jest",
+        {
+          "presets": [
+            [
+              "@babel/preset-env",
+              {
+                "targets": {
+                  "node": "current"
+                }
+              }
+            ],
+            "@babel/preset-react"
+          ]
+        }
+      ]
+    },
+    "testMatch": [
+      "**/__tests__/**/*.test.js",
+      "**/?(*.)+(spec|test).js"
+    ],
+    "testTimeout": 30000,
+    "collectCoverage": false,
+    "collectCoverageFrom": [
+      "pages/api/**/*.js",
+      "lib/**/*.js",
+      "models/**/*.js",
+      "!pages/api/auth/[...nextauth].js",
+      "!**/*.test.js",
+      "!**/node_modules/**"
+    ],
+    "forceExit": true
   }
 }
