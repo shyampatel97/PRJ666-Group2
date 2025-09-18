@@ -89,6 +89,8 @@
       "!**/*.test.js",
       "!**/node_modules/**"
     ],
-    "forceExit": true
+    "forceExit": true,
+    "detectOpenHandles": true
+
   }
 }
