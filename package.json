@@ -79,7 +79,7 @@
       "**/__tests__/**/*.test.js",
       "**/?(*.)+(spec|test).js"
     ],
-    "testTimeout": 30000,
+    "testTimeout": 10000,
     "collectCoverage": false,
     "collectCoverageFrom": [
       "pages/api/**/*.js",
@@ -89,8 +89,8 @@
       "!**/*.test.js",
       "!**/node_modules/**"
     ],
+    "maxWorkers": 1,
     "forceExit": true,
     "detectOpenHandles": true
-
   }
 }
