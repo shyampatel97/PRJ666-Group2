@@ -1,6 +1,43 @@
-const { validatePassword, validateRegistrationData } = require('../../../pages/api/auth/register')
-const { createMocks } = require('node-mocks-http')
-const handler = require('../../../pages/api/auth/register')
+import { validatePassword, validateRegistrationData } from '../../../pages/api/auth/register'
+import handler from '../../../pages/api/auth/register'
+import { createMocks } from 'node-mocks-http'
+
+// Mock the dependencies
+jest.mock('bcryptjs', () => ({
+  hash: jest.fn().mockResolvedValue('hashedPassword123')
+}))
+
+jest.mock('../../../lib/dbConnect', () => ({
+  dbConnect: jest.fn().mockResolvedValue(true)
+}))
+
+// Mock the User model
+const mockUser = {
+  findOne: jest.fn(),
+  save: jest.fn(),
+  _id: 'mockUserId123'
+}
+
+jest.mock('../../../models/User', () => {
+  return function User(userData) {
+    Object.assign(this, userData)
+    this._id = 'mockUserId123'
+    this.save = jest.fn().mockResolvedValue(this)
+    return this
+  }
+})
+
+// Mock User.findOne as a static method
+jest.doMock('../../../models/User', () => {
+  const UserConstructor = function User(userData) {
+    Object.assign(this, userData)
+    this._id = 'mockUserId123'
+    this.save = jest.fn().mockResolvedValue(this)
+    return this
+  }
+  UserConstructor.findOne = jest.fn()
+  return UserConstructor
+})
 
 describe('Registration Logic Tests - Real Functions', () => {
   
@@ -87,6 +124,10 @@ describe('Registration Logic Tests - Real Functions', () => {
 })
 
 describe('Registration Handler Tests - Basic Validation', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   test('should return 405 for non-POST methods', async () => {
     const { req, res } = createMocks({ method: 'GET' })
     await handler(req, res)
@@ -144,6 +185,10 @@ describe('Registration Handler Tests - Basic Validation', () => {
   })
 
   test('should validate complete registration input flow', async () => {
+    // Mock User.findOne to return null (no existing user)
+    const User = require('../../../models/User')
+    User.findOne = jest.fn().mockResolvedValue(null)
+
     const { req, res } = createMocks({
       method: 'POST',
       body: {
@@ -153,27 +198,48 @@ describe('Registration Handler Tests - Basic Validation', () => {
         password: 'Password123!',
         confirm_password: 'Password123!',
         location: 'Toronto',
-        
+        profile_image_url: 'https://example.com/image.jpg'
       }
     })
     
     await handler(req, res)
     
-    // This will likely return 500 because no real DB connection in tests
-    // But it validates that input validation passes
-    const statusCode = res._getStatusCode()
+    // Should succeed with valid data and mocked dependencies
+    expect(res._getStatusCode()).toBe(201)
+    const responseData = JSON.parse(res._getData())
+    expect(responseData.message).toBe('Registration successful! Please sign in with your credentials.')
+    expect(responseData.user).toMatchObject({
+      id: expect.any(String),
+      first_name: 'John',
+      last_name: 'Doe',
+      email: 'john@example.com',
+      location: 'Toronto',
+      profile_image_url: 'https://example.com/image.jpg'
+    })
+  })
+
+  test('should return 400 for existing user', async () => {
+    // Mock User.findOne to return existing user
+    const User = require('../../../models/User')
+    User.findOne = jest.fn().mockResolvedValue({ email: 'john@example.com' })
+
+    const { req, res } = createMocks({
+      method: 'POST',
+      body: {
+        first_name: 'John',
+        last_name: 'Doe',
+        email: 'john@example.com',
+        password: 'Password123!',
+        confirm_password: 'Password123!',
+        location: 'Toronto',
+        profile_image_url: 'https://example.com/image.jpg'
+      }
+    })
     
-    // Should either succeed (201) or fail due to DB issues (500), but not validation issues (400)
-    if (statusCode === 400) {
-      // If 400, it should not be due to validation errors we've tested above
-      const error = JSON.parse(res._getData()).error
-      expect(error).not.toBe('First name, last name, email, and password are required')
-      expect(error).not.toBe('Passwords do not match')
-      expect(error).not.toContain('Password must contain:')
-    }
+    await handler(req, res)
     
-    // Expect not success bcz of no profile image URL provided
-    expect([201, 500].includes(statusCode)).toBe(false)
+    expect(res._getStatusCode()).toBe(400)
+    expect(JSON.parse(res._getData()).error).toBe('User already exists with this email')
   })
 })
 

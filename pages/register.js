@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Eye, EyeOff, Upload, User, Check, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -17,6 +19,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // Password validation function
   const getPasswordValidation = (password) => {
@@ -35,6 +38,7 @@ export default function RegisterPage() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError(""); // Clear error when user starts typing
+    setSuccess("");
   };
 
   const handleImageUpload = async (e) => {
@@ -49,13 +53,13 @@ export default function RegisterPage() {
 
     setImageUploading(true);
     
-    // Simulate image upload - replace with actual upload logic
     try {
       // Create a temporary URL for preview
       const imageUrl = URL.createObjectURL(file);
       setForm({ ...form, profile_image_url: imageUrl });
       
-      // Here you would normally upload to your server
+      // Here you would normally upload to your server or cloud storage
+      // For now, we'll just use the blob URL
       setTimeout(() => {
         setImageUploading(false);
       }, 1000);
@@ -69,6 +73,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     
     // Client-side validation
     if (!form.first_name || !form.last_name || !form.email || !form.password || !form.confirm_password) {
@@ -89,13 +94,51 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      alert("Registration successful! Please sign in with your credentials.");
-      // In real app, redirect to login page
+      // Make actual API call to register endpoint
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          first_name: form.first_name,
+          last_name: form.last_name,
+          email: form.email,
+          password: form.password,
+          confirm_password: form.confirm_password,
+          location: form.location || "Not specified",
+          profile_image_url: form.profile_image_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=128&h=128&fit=crop&crop=face"
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Registration failed');
+      }
+
+      // Registration successful
+      setSuccess("Registration successful! Redirecting to login...");
+      
+      // Clear form
+      setForm({
+        first_name: "",
+        last_name: "",
+        email: "",
+        password: "",
+        confirm_password: "",
+        location: "",
+        profile_image_url: "",
+      });
+
+      // Redirect to login page after 2 seconds
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
+
     } catch (error) {
       console.error("Registration error:", error);
-      setError("Registration failed! Please try again.");
+      setError(error.message || "Registration failed! Please try again.");
     } finally {
       setLoading(false);
     }
@@ -124,8 +167,14 @@ export default function RegisterPage() {
             {error}
           </div>
         )}
+
+        {success && (
+          <div className="bg-green-50 border border-green-200 text-green-600 px-3 py-2 rounded-lg mb-4 text-sm">
+            {success}
+          </div>
+        )}
         
-        <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name Fields */}
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -291,7 +340,7 @@ export default function RegisterPage() {
           {/* Profile Photo Section - Inline Layout */}
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-2">
-              Profile Photo *
+              Profile Photo
             </label>
             <div className="flex items-center space-x-3">
               {form.profile_image_url ? (
@@ -333,7 +382,7 @@ export default function RegisterPage() {
           {/* Location */}
           <div>
             <label className="block text-xs font-medium text-gray-700 mb-1">
-              Location *
+              Location
             </label>
             <input
               name="location"
@@ -346,21 +395,21 @@ export default function RegisterPage() {
 
           {/* Submit Button */}
           <button 
-            onClick={handleSubmit}
+            type="submit"
             disabled={loading || imageUploading || !isPasswordValid} 
             className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors mt-6"
           >
             {loading ? "Creating Account..." : "Create Account"}
           </button>
-        </div>
+        </form>
 
         {/* Login Link */}
         <div className="text-center mt-4 text-xs text-gray-600">
-  Already have an account?{" "}
-  <Link href="/login" className="text-green-600 font-medium hover:text-green-700">
-    Sign In
-  </Link>
-</div>
+          Already have an account?{" "}
+          <Link href="/login" className="text-green-600 font-medium hover:text-green-700">
+            Sign In
+          </Link>
+        </div>
       </div>
     </div>
   );

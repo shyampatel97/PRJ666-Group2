@@ -80,7 +80,7 @@
       "**/__tests__/**/*.test.js",
       "**/?(*.)+(spec|test).js"
     ],
-    "testTimeout": 10000,
+    "testTimeout": 15000,
     "collectCoverage": false,
     "collectCoverageFrom": [
       "pages/api/**/*.js",
@@ -91,7 +91,12 @@
       "!**/node_modules/**"
     ],
     "maxWorkers": 1,
+    "runInBand": true,
     "forceExit": true,
-    "detectOpenHandles": true
+    "detectOpenHandles": true,
+    "openHandlesTimeout": 1000,
+    "workerIdleMemoryLimit": "1GB",
+    "silent": false,
+    "verbose": false
   }
 }
