@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Leaf, Bug, BarChart3, Store, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
+
 const HomePage = () => {
   useEffect(() => {
     // Horizontal scroll animation for services

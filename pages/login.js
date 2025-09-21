@@ -1,9 +1,10 @@
-// pages/login.js
+// pages/login.js - Refactored with components
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { signIn, getSession } from "next-auth/react";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
+import { Button, Input } from "../components";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,7 +13,6 @@ export default function LoginPage() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
@@ -23,7 +23,6 @@ export default function LoginPage() {
   const vantaEffect = useRef(null);
 
   useEffect(() => {
-    // Load external scripts
     const loadScript = (src) => {
       return new Promise((resolve, reject) => {
         if (document.querySelector(`script[src="${src}"]`)) {
@@ -40,16 +39,13 @@ export default function LoginPage() {
 
     const initVanta = async () => {
       try {
-        // Load p5.js first
         await loadScript(
           "https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"
         );
-        // Then load Vanta Topology
         await loadScript(
           "https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.topology.min.js"
         );
 
-        // Initialize Vanta effect after scripts are loaded
         if (window.VANTA && vantaRef.current && !vantaEffect.current) {
           vantaEffect.current = window.VANTA.TOPOLOGY({
             el: vantaRef.current,
@@ -97,7 +93,7 @@ export default function LoginPage() {
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError(""); // Clear error when user starts typing
+    setError("");
   };
 
   const handleGoogleSignIn = async () => {
@@ -122,7 +118,6 @@ export default function LoginPage() {
             setError("Google sign-in failed. Please try again.");
         }
       } else if (result?.ok) {
-        // Check session before redirecting
         const session = await getSession();
         if (session) {
           router.push("/profile");
@@ -145,7 +140,6 @@ export default function LoginPage() {
       return;
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email)) {
       setError("Please enter a valid email address");
@@ -155,53 +149,28 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      console.log("=== ATTEMPTING SIGN IN ===");
-      console.log("Email:", form.email.toLowerCase().trim());
-      console.log("Password length:", form.password.length);
-
       const result = await signIn("credentials", {
         email: form.email.toLowerCase().trim(),
         password: form.password,
         redirect: false,
       });
 
-      console.log("=== SIGN IN RESULT ===");
-      console.log("Result:", result);
-
       if (result?.ok) {
-        console.log("Sign in successful, checking session...");
-
-        // Wait a moment for session to be created
         await new Promise((resolve) => setTimeout(resolve, 100));
-
         const session = await getSession();
-        console.log("Session after sign in:", session);
-
+        
         if (session) {
-          console.log("Session found, redirecting to profile");
           router.push("/profile");
         } else {
-          console.log("No session found after successful login");
           setError("Session creation failed. Please try again.");
         }
       } else {
-        console.log("Sign in failed");
-
-        if (result?.error) {
-          console.error("Sign-in error:", result.error);
-
-          // NextAuth returns "CredentialsSignin" for any credential failure
-          if (result.error === "CredentialsSignin") {
-            setError(
-              "Invalid email or password. Please check your credentials and try again."
-            );
-          } else {
-            setError("Login failed. Please try again.");
-          }
-        } else {
+        if (result?.error === "CredentialsSignin") {
           setError(
-            "Login failed. Please check your credentials and try again."
+            "Invalid email or password. Please check your credentials and try again."
           );
+        } else {
+          setError("Login failed. Please try again.");
         }
       }
     } catch (error) {
@@ -337,7 +306,7 @@ export default function LoginPage() {
         `,
         }}
       />
-      {/* Dark overlay for better contrast */}
+      
       <div className="absolute inset-0 bg-black bg-opacity-10 z-0"></div>
 
       <div className="bg-white/1.5 backdrop-blur-[6px] rounded-3xl shadow-xl p-8 w-full max-w-md relative z-10 border border-white/10">
@@ -360,66 +329,52 @@ export default function LoginPage() {
           onSubmit={handleSubmit}
           className="space-y-6 animate-fade-in-up animation-delay-400"
         >
-          {/* Email */}
-          <div className="animate-slide-in-left animation-delay-600">
-            <label className="block text-sm font-medium text-white mb-2">
-              Email
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300 w-5 h-5" />
-              <input
-                name="email"
-                type="email"
-                placeholder="Enter your email"
-                value={form.email}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-white/30 rounded-lg bg-white/0 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-400 focus:border-transparent backdrop-blur-sm transition-all duration-300 focus:scale-105"
-                required
-                disabled={loading}
-              />
-            </div>
-          </div>
+          {/* Email Input */}
+          <Input
+            name="email"
+            type="email"
+            label="Email"
+            placeholder="Enter your email"
+            value={form.email}
+            onChange={handleChange}
+            icon={Mail}
+            variant="glassmorphism"
+            required
+            disabled={loading}
+            maxLength={100}
+            className="animate-slide-in-left animation-delay-600"
+          />
 
-          {/* Password */}
-          <div className="animate-slide-in-right animation-delay-800">
-            <label className="block text-sm font-medium text-white mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300 w-5 h-5" />
-              <input
-                name="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                value={form.password}
-                onChange={handleChange}
-                className="w-full pl-10 pr-12 py-3 border border-white/30 rounded-lg bg-white/0 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-400 focus:border-transparent backdrop-blur-sm transition-all duration-300 focus:scale-105"
-                required
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-300 hover:text-white transition-all duration-200 hover:scale-110"
-                disabled={loading}
-              >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
-            </div>
-          </div>
+          {/* Password Input */}
+          <Input
+            name="password"
+            type="password"
+            label="Password"
+            placeholder="Enter your password"
+            value={form.password}
+            onChange={handleChange}
+            icon={Lock}
+            showPasswordToggle
+            variant="glassmorphism"
+            required
+            disabled={loading}
+            maxLength={50}
+            className="animate-slide-in-right animation-delay-800"
+          />
 
           {/* Submit Button */}
-          <button
+          <Button
             type="submit"
+            variant="primary"
+            size="md"
+            fullWidth
             disabled={loading}
-            className="w-full bg-[#C5D96F] border border-[#99d98c] text-black py-3 rounded-lg font-bold hover:bg-[#A1B84C] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 hover:shadow-lg animate-bounce-in animation-delay-1000"
+            loading={loading}
+            loadingText="Signing In..."
+            className="animate-bounce-in animation-delay-1000"
           >
-            {loading ? "Signing In..." : "Sign In"}
-          </button>
+            Sign In
+          </Button>
         </form>
 
         {/* Google Sign In */}
@@ -434,10 +389,15 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <button
+        <Button
           onClick={handleGoogleSignIn}
+          variant="google"
+          size="md"
+          fullWidth
           disabled={loading}
-          className="w-full flex items-center justify-center px-4 py-3 border border-white/30 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-colors disabled:opacity-50 backdrop-blur-sm"
+          loading={loading}
+          loadingText="Connecting..."
+          className="flex items-center justify-center"
         >
           <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
             <path
@@ -457,10 +417,10 @@ export default function LoginPage() {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          {loading ? "Connecting..." : "Continue with Google"}
-        </button>
+          Continue with Google
+        </Button>
 
-        {/* Register Link */}
+        {/* Links */}
         <div className="text-center mt-3 text-sm text-gray-200">
           Do not have an account?{" "}
           <Link
@@ -470,6 +430,7 @@ export default function LoginPage() {
             Sign Up
           </Link>
         </div>
+        
         <div className="text-center mt-3 text-sm text-gray-200">
           <button
             type="button"
@@ -481,6 +442,7 @@ export default function LoginPage() {
         </div>
       </div>
 
+      {/* Forgot Password Modal */}
       {showForgotPassword && (
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in-up">
           <div className="bg-white/20 backdrop-blur-[90px] rounded-3xl p-8 w-full max-w-md border border-white/10 shadow-xl">
@@ -494,32 +456,37 @@ export default function LoginPage() {
               onSubmit={handleForgotPassword}
               className="space-y-6 animate-fade-in-up animation-delay-400"
             >
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300 w-5 h-5" />
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-white/30 rounded-lg bg-white/0 text-white placeholder-gray-300 focus:ring-2 focus:ring-green-400 focus:border-transparent backdrop-blur-sm transition-all duration-300 focus:scale-105"
-                  required
-                />
-              </div>
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                icon={Mail}
+                variant="glassmorphism"
+                required
+              />
+              
               <div className="flex space-x-3">
-                <button
+                <Button
                   type="button"
                   onClick={() => setShowForgotPassword(false)}
-                  className="flex-1 px-4 py-3 border border-white/70 rounded-lg text-white hover:bg-white/10 transition-all duration-300"
+                  variant="outline"
+                  size="md"
+                  className="flex-1"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type="submit"
+                  variant="primary"
+                  size="md"
                   disabled={forgotLoading}
-                  className="flex-1 px-4 py-3 bg-[#C5D96F60] border border-[#99d98c] text-white font-bold rounded-lg hover:bg-[#A1B84C66] disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                  loading={forgotLoading}
+                  loadingText="Sending..."
+                  className="flex-1 bg-[#C5D96F60] border border-[#99d98c] hover:bg-[#A1B84C66]"
                 >
-                  {forgotLoading ? "Sending..." : "Send OTP"}
-                </button>
+                  Send OTP
+                </Button>
               </div>
             </form>
           </div>
