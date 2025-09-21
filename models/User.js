@@ -69,7 +69,16 @@ const UserSchema = new mongoose.Schema({
   updated_at: {
     type: Date,
     default: Date.now
-  }
+  },
+  resetToken: {
+  type: String,
+  default: null
+},
+resetTokenExpiry: {
+  type: Date,
+  default: null
+},
+
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 })
