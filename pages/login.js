@@ -341,7 +341,7 @@ export default function LoginPage() {
             variant="glassmorphism"
             required
             disabled={loading}
-            maxLength={100}
+            maxLength={35}
             className="animate-slide-in-left animation-delay-600"
           />
 
