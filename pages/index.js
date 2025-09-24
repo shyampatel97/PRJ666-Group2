@@ -1,61 +1,11 @@
-import React, { useEffect } from "react";
-import { Leaf, Bug, BarChart3, Store, ArrowRight } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Leaf, Bug, BarChart3, Store, ArrowRight, LeafIcon } from "lucide-react";
 import Navbar from "@/components/Navbar";
 
-
 const HomePage = () => {
+  const [isHovered, setIsHovered] = useState(false);
+
   useEffect(() => {
-    // Horizontal scroll animation for services
-    const $sectionPin = document.querySelector("#sectionPin");
-    const $pinWrapSticky = document.querySelector(".pin-wrap-sticky");
-    const $pinWrap = document.querySelector(".pin-wrap");
-
-    if ($sectionPin && $pinWrapSticky && $pinWrap) {
-      $sectionPin.style.height = "500vh";
-      $sectionPin.style.overflow = "visible";
-
-      $pinWrapSticky.style.height = "100vh";
-      $pinWrapSticky.style.width = "100vw";
-      $pinWrapSticky.style.position = "sticky";
-      $pinWrapSticky.style.top = "0";
-      $pinWrapSticky.style.overflowX = "hidden";
-
-      $pinWrap.style.height = "100vh";
-      $pinWrap.style.width = "500vw"; // 5 sections (title + 4 cards)
-
-      if (typeof ViewTimeline !== "undefined") {
-        $pinWrap.animate(
-          {
-            transform: ["", "translateX(calc(-100% + 100vw))"],
-          },
-          {
-            timeline: new ViewTimeline({
-              subject: $sectionPin,
-              axis: "block",
-            }),
-            fill: "forwards",
-            rangeStart: "contain 0%",
-            rangeEnd: "contain 100%",
-          }
-        );
-      } else {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                const scrollProgress = entry.intersectionRatio;
-                const translateX = -400 * scrollProgress;
-                $pinWrap.style.transform = `translateX(${translateX}vw)`;
-              }
-            });
-          },
-          { threshold: Array.from({ length: 101 }, (_, i) => i / 100) }
-        );
-
-        observer.observe($sectionPin);
-      }
-    }
-
     // Reverse scroll animation for photo columns
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -84,6 +34,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      <Navbar />
       <style jsx>{`
         @keyframes fadeInUp {
           from {
@@ -137,20 +88,68 @@ const HomePage = () => {
               0 0 30px rgba(34, 197, 94, 0.4);
           }
         }
-        .animate-fade-in-up {
-          animation: fadeInUp 0.8s ease-out forwards;
+        /* Animations from provided CSS */
+        @keyframes pop {
+          0% {
+            opacity: 0;
+            transform: scale(0.5, 0.5);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1, 1);
+          }
         }
-        .animate-slide-in-left {
-          animation: slideInLeft 0.8s ease-out forwards;
+        @keyframes slide-left {
+          0% {
+            opacity: 0;
+            transform: translate(-40px, 0);
+          }
+          100% {
+            opacity: 1;
+            transform: translate(0, 0);
+          }
         }
-        .animate-slide-in-right {
-          animation: slideInRight 0.8s ease-out forwards;
+        @keyframes slide-up {
+          0% {
+            opacity: 0;
+            transform: translateY(3em);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
-        .animate-leaf-bounce {
-          animation: leafBounce 2s ease-in-out infinite;
+        .animate {
+          animation-duration: 0.7s;
+          animation-timing-function: cubic-bezier(0.26, 0.53, 0.74, 1.48);
+          animation-fill-mode: backwards;
         }
-        .animate-text-glow {
-          animation: textGlow 3s ease-in-out infinite;
+        .pop {
+          animation-name: pop;
+        }
+        .slide-left {
+          animation-name: slide-left;
+        }
+        .slide-up {
+          animation-name: slide-up;
+        }
+        .delay-2 {
+          animation-delay: 0.6s;
+        }
+        .delay-4 {
+          animation-delay: 1.2s;
+        }
+        .delay-5 {
+          animation-delay: 1.5s;
+        }
+        .delay-6 {
+          animation-delay: 1.8s;
+        }
+        .delay-7 {
+          animation-delay: 2.1s;
+        }
+        .delay-8 {
+          animation-delay: 2.4s;
         }
         .mission-title {
           opacity: 0;
@@ -203,55 +202,127 @@ const HomePage = () => {
           object-fit: cover;
           display: block;
         }
-
-        /* Plant ID Card Full Image Cover */
-        .plant-id-wrapper {
-          position: relative;
-          height: 400px;
-          width: 600px;
+        /* Updated Plant ID Card Styles */
+        .plant-id-wrap {
+          display: flex;
+          flex-wrap: nowrap;
+          justify-content: space-between;
+          width: 100%; 
+          max-width: 800px;
+          height: 500px;
           margin: 0 auto;
+          border: 1px solid white; 
+          border-radius: 20px;
+          transition: 0.3s ease-in-out;
+          position: relative;
           overflow: hidden;
-          border-radius: 1rem;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-          cursor: pointer;
-        }
-        .plant-id-image {
-          width: 100%;
-          height: 100%;
-          object-fit: contain; /* fits full image without cutting edges */
-          transition: transform 0.5s ease-in-out;
-        }
-        .plant-id-wrapper:hover .plant-id-image {
-          transform: scale(2);
         }
         .plant-id-overlay {
+          position: relative;
+          display: flex;
+          width: 100%;
+          height: 100%;
+          padding: 1rem 0.75rem;
+          background: #186218;
+          transition: 0.4s ease-in-out;
+          z-index: 1;
+        }
+        .plant-id-overlay-content {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          width: 100%;
+          height: 500%;
+          padding: 0.5rem 0 0 0.5rem;
+          border: 3px solid;
+          border-image: linear-gradient(
+            to bottom,
+            #aea724 5%,
+            forestgreen 35% 65%,
+            #aea724 95%
+          ) 0 0 0 100%;
+          transition: 0.3s ease-in-out 0.2s;
+          z-index: 1;
+        }
+        .plant-id-image-content {
           position: absolute;
-          top: 50%;
-          right: 10%;
-          transform: translateY(-50%);
-          background: rgba(0, 0, 0, 0.4);
+          top: 0;
+          right: 0;
+          width: 100%;
+          height: 100%;
+          background-size: cover;
+          transition: 0.3s ease-in-out;
+        }
+        .plant-id-dots {
+          position: absolute;
+          bottom: 50%;
+          right: 1rem;
+          transform: translateY(50%);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          width: 20px;
+          height: 60px;
+          transition: 0.3s ease-in-out 0.3s;
+        }
+        .plant-id-dot {
+          width: 10px;
+          height: 10px;
+          background: yellow;
+          border: 1px solid indigo;
+          border-radius: 50%;
+          margin: 5px 0;
+          transition: 0.3s ease-in-out 0.3s;
+        }
+        .plant-id-text {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 100%;
+          height: 100%;
+          margin: 1rem;
           padding: 1.5rem;
-          border-radius: 0.75rem;
-          max-width: 250px;
-        }
-        .plant-id-title {
-          color: #ffffff;
-          font-size: 24px;
-          font-weight: 700;
-          margin-bottom: 1rem;
-          text-align: left;
-        }
-        .plant-id-description {
-          color: #f3f4f6;
-          font-size: 16px;
+          background: #fff;
+          font-size: max(10pt, 2vmin);
           line-height: 1.5;
-          text-align: left;
+          color: #0e390e;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+        .plant-id-inset {
+          max-width: 50%;
+          margin: 0.25em 1em 1em 0;
+          border-radius: 0.25em;
+          float: left;
+        }
+        .plant-id-tree {
+          place-self: center;
+          width: calc(50px + 2vw);
+        }
+        .plant-id-wrap:hover .plant-id-overlay {
+          transform: translateX(-500px);
+        }
+        .plant-id-wrap:hover .plant-id-image-content {
+          width: 300px;
+        }
+        .plant-id-wrap:hover .plant-id-overlay-content {
+          border: none;
+          transition-delay: 0.2s;
+          transform: translateX(500px);
+        }
+        .plant-id-wrap:hover .plant-id-dots {
+          transform: translateY(50%) translateX(1rem);
+        }
+        .plant-id-wrap:hover .plant-id-dot {
+          background: white;
         }
       `}</style>
 
       {/* Hero Section */}
       <section
-        className="relative h-screen bg-cover bg-center bg-no-repeat"
+        className="relative h-screen bg-cover bg-center bg-no-repeat pt-16"
         style={{ backgroundImage: "url(/hero-part1.png)" }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-0"></div>
@@ -442,89 +513,150 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Horizontal Scroll Services Section */}
-      <section id="sectionPin" className="py-20 bg-white-50">
-        <div className="pin-wrap-sticky">
-          <div className="pin-wrap flex items-center">
-            <div className="w-screen h-full flex items-center justify-center px-6">
-              <h2 className="text-4xl font-bold text-green-800 text-center">
-                Our Services
-              </h2>
-            </div>
-            {/* Plant Identification Card with Hover Effect */}
-            <div className="w-screen h-full flex items-center justify-center px-16">
-              <div className="relative flex h-[300px] w-[600px] transition-all duration-200 ease-in-out group">
-                {/* Image Wrapper */}
-                <div className="h-[300px] w-[450px] overflow-hidden rounded-xl cursor-pointer transition-all duration-200 ease-in-out group-hover:w-[800px]">
-                  <img
-                    src="/plantidentification-card.png"
-                    alt="Plant Identification"
-                    className="h-[300px] w-[450px] object-contain transition-all duration-200 ease-in-out group-hover:scale-150"
-                  />
+      {/* Services Section (Grid Layout) */}
+      <section className="py-20 bg-white-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+            {/* Plant Identification */}
+            <div id="plant-identification-card" className="plant-id-wrap animate pop">
+              <div id="plant-identification-overlay" className="plant-id-overlay">
+                <div id="plant-identification-content" className="plant-id-overlay-content animate slide-left delay-2">
+                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-white text-center">
+                    Plant Identification
+                  </h3>
+                  <p
+                    className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
+                    style={{ marginBottom: "1.5rem" }}
+                  >
+                  </p>
                 </div>
-
-                {/* Text Overlay */}
-                <div className="absolute left-[380px] h-[300px] w-[300px] flex flex-col overflow-hidden transition-all duration-200 ease-in-out">
-                  <h1 className="relative bottom-0 h-[300px] text-green-800 text-[48px] font-bold uppercase leading-tight transition-all duration-200 ease-in-out group-hover:bottom-[300px] group-hover:scale-[0.5]">
-                    Plant ID
-                  </h1>
-                  <h1 className="relative bottom-0 h-[300px] text-gray-700 text-[36px] font-semibold transition-all duration-200 ease-in-out group-hover:bottom-[300px] group-hover:scale-[0.5]">
-                    See More
-                  </h1>
+                <div className="plant-id-image-content animate slide delay-5" style={{ backgroundImage: "url(https://assets.codepen.io/4787486/trees.png)" }}></div>
+                <div id="plant-identification-dots" className="plant-id-dots animate">
+                  <div className="plant-id-dot animate slide-up delay-6"></div>
+                  <div className="plant-id-dot animate slide-up delay-7"></div>
+                  <div className="plant-id-dot animate slide-up delay-8"></div>
                 </div>
+              </div>
+              <div id="plant-identification-text" className="plant-id-text text-justify">
+                <p className="text-xs md:text-sm leading-relaxed mb-2">
+                  Detect diseases before they spread. With just a photo, our AI
+                  can identify common crop diseases and alert you to early signs
+                  of trouble.
+                </p>
+                <p className="text-xs md:text-sm leading-relaxed mb-2">
+                  Prevent loss, protect your harvest, and act fast with
+                  science-backed solutions. Our platform empowers farmers with
+                  precise plant identification.
+                </p>
+                <p className="text-xs md:text-sm leading-relaxed">
+                  Built for ease, our tool ensures you can monitor crop health
+                  effectively and sustainably.
+                </p>
               </div>
             </div>
 
             {/* Disease Diagnosis */}
-            <div className="w-screen h-full flex items-center justify-center px-16">
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 max-w-md mx-auto">
-                <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                  <Bug className="w-8 h-8 text-amber-700" />
+            <div id="disease-diagnosis-card" className="plant-id-wrap animate pop">
+              <div id="disease-diagnosis-overlay" className="plant-id-overlay">
+                <div id="disease-diagnosis-content" className="plant-id-overlay-content animate slide-left delay-2">
+                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-white text-center">
+                    Disease Diagnosis
+                  </h3>
+                  <p
+                    className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
+                    style={{ marginBottom: "1.5rem" }}
+                  >
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-green-800 mb-4 text-center">
-                  Disease
-                  <br />
-                  Diagnosis
-                </h3>
-                <p className="text-gray-600 leading-relaxed text-center">
-                  Detect diseases before they spread. With just a photo, our AI
-                  can identify common crop diseases and alert you to early signs
-                  of trouble. Prevent loss, protect your harvest, and act fast
-                  with science-backed solutions.
+                <div className="plant-id-image-content animate slide delay-5" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600)" }}></div>
+                <div id="disease-diagnosis-dots" className="plant-id-dots animate">
+                  <div className="plant-id-dot animate slide-up delay-6"></div>
+                  <div className="plant-id-dot animate slide-up delay-7"></div>
+                  <div className="plant-id-dot animate slide-up delay-8"></div>
+                </div>
+              </div>
+              <div id="disease-diagnosis-text" className="plant-id-text text-justify">
+                <p className="text-xs md:text-sm leading-relaxed mb-2">
+                  Detect diseases before they spread. Our AI analyzes photos to
+                  identify crop diseases and provides early warnings.
+                </p>
+                <p className="text-xs md:text-sm leading-relaxed mb-2">
+                  Take action quickly with expert recommendations to protect
+                  your harvest and reduce losses.
+                </p>
+                <p className="text-xs md:text-sm leading-relaxed">
+                  Designed for efficiency, ensuring timely and accurate
+                  diagnostics for sustainable farming.
                 </p>
               </div>
             </div>
+
             {/* Dashboard */}
-            <div className="w-screen h-full flex items-center justify-center px-16">
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 max-w-md mx-auto">
-                <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                  <BarChart3 className="w-8 h-8 text-green-600" />
+            <div id="dashboard-card" className="plant-id-wrap animate pop">
+              <div id="dashboard-overlay" className="plant-id-overlay">
+                <div id="dashboard-content" className="plant-id-overlay-content animate slide-left delay-2">
+                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-white text-center">
+                    Dashboard
+                  </h3>
+                  <p
+                    className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
+                    style={{ marginBottom: "1.5rem" }}
+                  >
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-green-800 mb-4 text-center">
-                  Dashboard
-                </h3>
-                <p className="text-gray-600 leading-relaxed text-center">
-                  Track daily plant health, view real-time weather updates, and
-                  get AI-powered care suggestions. Monitor your personal plant
-                  collection and receive timely alerts to keep every plant
-                  thriving.
+                <div className="plant-id-image-content animate slide delay-5" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=600)" }}></div>
+                <div id="dashboard-dots" className="plant-id-dots animate">
+                  <div className="plant-id-dot animate slide-up delay-6"></div>
+                  <div className="plant-id-dot animate slide-up delay-7"></div>
+                  <div className="plant-id-dot animate slide-up delay-8"></div>
+                </div>
+              </div>
+              <div id="dashboard-text" className="plant-id-text text-justify">
+                <p className="text-xs md:text-sm leading-relaxed mb-2">
+                  Track plant health daily with real-time updates and AI
+                  insights.
+                </p>
+                <p className="text-xs md:text-sm leading-relaxed mb-2">
+                  Receive weather forecasts and care suggestions to optimize
+                  your farming practices.
+                </p>
+                <p className="text-xs md:text-sm leading-relaxed">
+                  Stay informed with alerts to keep your plants thriving
+                  sustainably.
                 </p>
               </div>
             </div>
+
             {/* Marketplace */}
-            <div className="w-screen h-full flex items-center justify-center px-16">
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 max-w-md mx-auto">
-                <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                  <Store className="w-8 h-8 text-amber-700" />
+            <div id="marketplace-card" className="plant-id-wrap animate pop">
+              <div id="marketplace-overlay" className="plant-id-overlay">
+                <div id="marketplace-content" className="plant-id-overlay-content animate slide-left delay-2">
+                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-white text-center">
+                    Marketplace
+                  </h3>
+                  <p
+                    className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
+                    style={{ marginBottom: "1.5rem" }}
+                  >
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold text-green-800 mb-4 text-center">
-                  Marketplace
-                </h3>
-                <p className="text-gray-600 leading-relaxed text-center">
-                  Find trusted tools, seeds, fertilizers, and plant care
-                  products all in one place. Curated by experts and tried by
-                  fellow farmers, our marketplace ensures you get quality,
-                  affordable farming essentials.
+                <div className="plant-id-image-content animate slide delay-5" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=600)" }}></div>
+                <div id="marketplace-dots" className="plant-id-dots animate">
+                  <div className="plant-id-dot animate slide-up delay-6"></div>
+                  <div className="plant-id-dot animate slide-up delay-7"></div>
+                  <div className="plant-id-dot animate slide-up delay-8"></div>
+                </div>
+              </div>
+              <div id="marketplace-text" className="plant-id-text text-justify">
+                <p className="text-xs md:text-sm leading-relaxed mb-2">
+                  Discover trusted tools, seeds, and fertilizers in one place.
+                </p>
+                <p className="text-xs md:text-sm leading-relaxed mb-2">
+                  Curated by experts and tested by farmers for quality and
+                  affordability.
+                </p>
+                <p className="text-xs md:text-sm leading-relaxed">
+                  Support sustainable farming with community-driven products.
                 </p>
               </div>
             </div>
