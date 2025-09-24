@@ -32,12 +32,17 @@ export default function Profile() {
             last_name:
               sessionData.user.last_name ||
               sessionData.user.name?.split(" ").slice(1).join(" "),
+            role: 
+              sessionData.user.role,
+            description: 
+              sessionData.user.description,
             profile_image_url:
               sessionData.user.profile_image_url || sessionData.user.image,
             location: sessionData.user.location,
             stats: sessionData.user.stats,
           };
-
+          // console.log(sessionData.user);
+          // console.log("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii")
           setUser(userData);
 
           try {
@@ -264,10 +269,10 @@ export default function Profile() {
               {user.first_name} {user.last_name}
             </h1>
             <p className="text-gray-600 text-base md:text-lg mb-2">
-              Farmer | Crop Advisor
+              {user.role}
             </p>
             <p className="text-gray-700 text-sm md:text-base">
-              Hey! I am {user.first_name}. How is your plants feeling today?
+              {user.description}
             </p>
           </div>
 

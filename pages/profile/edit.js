@@ -1,21 +1,22 @@
-//profile/edit.js
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useSession, getSession } from "next-auth/react";
 
 export default function EditProfile() {
+  const { data: session, update: updateSession } = useSession(); // Add updateSession
   const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
     location: "",
+    description: "",
     profile_image_url: ""
   });
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -23,39 +24,30 @@ export default function EditProfile() {
       try {
         setLoading(true);
         
-        // Get user session
-        const sessionResponse = await fetch("/api/auth/session");
-        const sessionData = await sessionResponse.json();
-        
-        console.log("Session response:", sessionData);
-        
-        if (sessionData && sessionData.user) {
+        // Use NextAuth session directly instead of fetch
+        if (session && session.user) {
           const userData = {
-            id: sessionData.user.id,
-            email: sessionData.user.email,
-            first_name: sessionData.user.first_name || sessionData.user.name?.split(' ')[0],
-            last_name: sessionData.user.last_name || sessionData.user.name?.split(' ').slice(1).join(' '),
-            profile_image_url: sessionData.user.profile_image_url || sessionData.user.image,
-            location: sessionData.user.location,
-            stats: sessionData.user.stats
+            id: session.user.id,
+            email: session.user.email,
+            first_name: session.user.first_name || session.user.name?.split(' ')[0] || '',
+            last_name: session.user.last_name || session.user.name?.split(' ').slice(1).join(' ') || '',
+            profile_image_url: session.user.profile_image_url || session.user.image || '',
+            location: session.user.location || '',
+            description: session.user.description || '',
+            stats: session.user.stats
           };
           
           setUser(userData);
           
-          // Fetch user's marketplace listings
-          try {
-            const listingsResponse = await fetch(`/api/marketplace/user/${userData.id}`);
-            if (listingsResponse.ok) {
-              const listingsData = await listingsResponse.json();
-              if (listingsData.success) {
-                setMarketplaceListings(listingsData.data || []);
-              }
-            }
-          } catch (listingsError) {
-            console.error("Error fetching marketplace listings:", listingsError);
-            // Don't set error state for listings - just keep empty array
-            setMarketplaceListings([]);
-          }
+          // Initialize form with user data
+          setFormData({
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            location: userData.location,
+            description: userData.description,
+            profile_image_url: userData.profile_image_url
+          });
+          
         } else {
           // No valid session - redirect to login
           console.log("No valid session found, redirecting to login");
@@ -70,8 +62,10 @@ export default function EditProfile() {
       }
     };
 
-    fetchUserData();
-  }, [router])
+    if (session !== undefined) { // Wait for session to load
+      fetchUserData();
+    }
+  }, [session, router]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -81,27 +75,53 @@ export default function EditProfile() {
     }));
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+  const handleImageUpload = async (file, error) => {
+    if (error) {
+      console.error('File upload error:', error);
+      setError(error);
+      return;
     }
-  };
 
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-    });
+    if (!file) {
+      return;
+    }
+
+    try {
+      setImageUploading(true);
+      setError("");
+
+      // Create FormData to send file
+      const formDataForUpload = new FormData();
+      formDataForUpload.append('file', file);
+      formDataForUpload.append('type', 'profile');
+
+      // Upload to your existing API route
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataForUpload,
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.secure_url) {
+        // Update form with new Cloudinary URL
+        setFormData(prev => ({
+          ...prev,
+          profile_image_url: data.secure_url
+        }));
+        
+        console.log('Image uploaded successfully:', data.secure_url);
+      } else {
+        console.error('Upload failed:', data.error);
+        setError(data.error || 'Image upload failed. Please try again.');
+      }
+
+    } catch (uploadError) {
+      console.error('Upload error:', uploadError);
+      setError('Network error during image upload. Please check your connection and try again.');
+    } finally {
+      setImageUploading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -111,44 +131,52 @@ export default function EditProfile() {
     setSuccess(false);
 
     try {
-      const token = localStorage.getItem("token");
-      
-      // Prepare submit data
+      // Remove localStorage token - use session cookies instead
       const submitData = {
+        userId: session?.user?.id, // Include userId from session
         first_name: formData.first_name,
         last_name: formData.last_name,
         location: formData.location,
+        description: formData.description,
+        profile_image_url: formData.profile_image_url
       };
-      
-      // Convert image to base64 if new file selected
-      if (imageFile) {
-        try {
-          const base64 = await convertToBase64(imageFile);
-          submitData.profile_image_base64 = base64;
-        } catch (conversionError) {
-          throw new Error("Failed to process image");
-        }
-      }
 
       const response = await fetch("/api/auth/update-profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: 'include', // Use session cookies
         body: JSON.stringify(submitData),
       });
 
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.message || "Failed to update profile");
+        throw new Error(data.error || "Failed to update profile");
       }
 
       setSuccess(true);
+
+      // Trigger NextAuth session update
+      await updateSession({
+        ...session,
+        user: {
+          ...session.user,
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          location: formData.location,
+          description: formData.description,
+          profile_image_url: formData.profile_image_url,
+          name: `${formData.first_name} ${formData.last_name}`,
+          image: formData.profile_image_url // Update image too
+        }
+      });
+
+      // Wait for session to update, then redirect
       setTimeout(() => {
         router.push("/profile");
-      }, 1500);
+      }, 1000);
 
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -158,7 +186,8 @@ export default function EditProfile() {
     }
   };
 
-  if (loading) {
+  // Show loading while session is loading
+  if (session === undefined || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-800"></div>
@@ -236,7 +265,7 @@ export default function EditProfile() {
               <div className="flex items-center space-x-6">
                 <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-4 border-gray-200">
                   <img
-                    src={imagePreview || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=128&h=128&fit=crop&crop=face"}
+                    src={formData.profile_image_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=128&h=128&fit=crop&crop=face"}
                     alt="Profile preview"
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -245,16 +274,33 @@ export default function EditProfile() {
                   />
                 </div>
                 <div>
-                  <label className="bg-green-800 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors cursor-pointer font-medium">
-                    Choose New Image
+                  <label className={`bg-green-800 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors cursor-pointer font-medium ${imageUploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    {imageUploading ? 'Uploading...' : 'Choose New Image'}
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={handleImageChange}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          // Check file size (5MB limit)
+                          if (file.size > 5 * 1024 * 1024) {
+                            handleImageUpload(null, 'File size should be less than 5MB');
+                            return;
+                          }
+                          handleImageUpload(file, null);
+                        }
+                      }}
                       className="hidden"
+                      disabled={imageUploading}
                     />
                   </label>
                   <p className="text-sm text-gray-500 mt-2">JPG, PNG up to 5MB</p>
+                  {imageUploading && (
+                    <div className="flex items-center mt-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-800 mr-2"></div>
+                      <span className="text-sm text-green-700">Uploading image...</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -310,6 +356,22 @@ export default function EditProfile() {
               />
             </div>
 
+            {/* Description */}
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                rows={3}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-800 focus:border-transparent transition-all resize-none"
+                placeholder="Tell us about yourself..."
+              />
+            </div>
+
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row sm:justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
               <button
@@ -328,7 +390,7 @@ export default function EditProfile() {
               </button>
               <button
                 type="submit"
-                disabled={updating}
+                disabled={updating || imageUploading}
                 className="w-full sm:w-auto px-6 py-3 bg-green-800 text-white rounded-xl hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
                 {updating ? (

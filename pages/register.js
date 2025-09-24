@@ -87,25 +87,60 @@ export default function RegisterPage() {
     setError("");
   };
 
-  const handleImageUpload = (file, error) => {
-    if (error) {
-      setError(error);
-      return;
+  // In your register form component
+const handleImageUpload = async (file, error) => {
+  if (error) {
+    console.error('File upload error:', error);
+    // Handle error - maybe show toast or set error state
+    return;
+  }
+
+  if (!file) {
+    // Clear the image if no file selected
+    setForm(prev => ({
+      ...prev,
+      profile_image_url: ''
+    }));
+    return;
+  }
+
+  try {
+    setImageUploading(true);
+
+    // Create FormData to send file
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', 'profile'); // Specify this is for profile upload
+
+    // Upload to your existing API route
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.secure_url) {
+      // Update form with Cloudinary URL
+      setForm(prev => ({
+        ...prev,
+        profile_image_url: data.secure_url
+      }));
+      
+      // Optional: Show success message
+      console.log('Image uploaded successfully:', data.secure_url);
+    } else {
+      console.error('Upload failed:', data.error);
+      // Handle upload failure - you might want to show an error message to user
     }
 
-    if (file) {
-      setImageUploading(true);
-      try {
-        const imageUrl = URL.createObjectURL(file);
-        setForm({ ...form, profile_image_url: imageUrl });
-        setTimeout(() => setImageUploading(false), 1000);
-      } catch (err) {
-        console.error(err);
-        setError("Image upload failed. Please try again.");
-        setImageUploading(false);
-      }
-    }
-  };
+  } catch (uploadError) {
+    console.error('Upload error:', uploadError);
+    // Handle network or other errors
+  } finally {
+    setImageUploading(false);
+  }
+};
 
   // FIXED handleSubmit function
   const handleSubmit = async (e) => {

@@ -532,7 +532,7 @@ const HomePage = () => {
                 </div>
                 <div className="plant-id-image-content animate slide delay-5">
                  <img
-                    src="/plant-identify.jpg"
+                    src="/plant-identify.JPG"
                     alt="Disease Diagnoses"
                     style={{
                       width: "100%",
@@ -580,7 +580,7 @@ const HomePage = () => {
                 </div>
                 <div className="plant-id-image-content animate slide delay-5">
                 <img
-                    src="/disease-diagnoses.jpg"
+                    src="/disease-diagnoses.JPG"
                     alt="Disease Diagnoses"
                     style={{
                       width: "100%",
@@ -626,7 +626,7 @@ const HomePage = () => {
                 </div>
                 <div className="plant-id-image-content animate slide delay-5">
                   <img
-                    src="/dashboard.jpg"
+                    src="/dashboard.JPG"
                     alt="Disease Diagnoses"
                     style={{
                       width: "100%",
@@ -672,7 +672,7 @@ const HomePage = () => {
                 </div>
                 <div className="plant-id-image-content animate slide delay-5">
                   <img
-                    src="/marketplace.jpg"
+                    src="/marketplace.JPG"
                     alt="Disease Diagnoses"
                     style={{
                       width: "100%",

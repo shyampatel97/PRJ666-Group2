@@ -22,6 +22,15 @@ const UserSchema = new mongoose.Schema({
     trim: true,
     match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please provide a valid email address']
   },
+  role: {
+    type: String,
+    default: 'Farmer'
+  },
+  description:{
+    type: String,
+    default: 'Hi there! How is your Plants?',
+    maxLength: [500, 'Description cannot exceed 500 characters']
+  },
   password_hash: {
     type: String,
     required: false
