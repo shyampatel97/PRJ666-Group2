@@ -312,7 +312,7 @@ export default function LoginPage() {
       <div className="bg-white/1.5 backdrop-blur-[6px] rounded-3xl shadow-xl p-8 w-full max-w-md relative z-10 border border-white/10">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2 animate-fade-in-up">
-            Jai shree Krishna
+            Welcome back
           </h1>
           <p className="text-gray-200 animate-fade-in-up animation-delay-200">
             Login to your AgroCare account
