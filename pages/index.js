@@ -530,7 +530,17 @@ const HomePage = () => {
                   >
                   </p>
                 </div>
-                <div className="plant-id-image-content animate slide delay-5" style={{ backgroundImage: "url(https://assets.codepen.io/4787486/trees.png)" }}></div>
+                <div className="plant-id-image-content animate slide delay-5">
+                 <img
+                    src="/plant-identify.jpg"
+                    alt="Disease Diagnoses"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                    />
+                </div>
                 <div id="plant-identification-dots" className="plant-id-dots animate">
                   <div className="plant-id-dot animate slide-up delay-6"></div>
                   <div className="plant-id-dot animate slide-up delay-7"></div>
@@ -568,7 +578,17 @@ const HomePage = () => {
                   >
                   </p>
                 </div>
-                <div className="plant-id-image-content animate slide delay-5" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=600)" }}></div>
+                <div className="plant-id-image-content animate slide delay-5">
+                <img
+                    src="/disease-diagnoses.jpg"
+                    alt="Disease Diagnoses"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                    />
+                </div>
                 <div id="disease-diagnosis-dots" className="plant-id-dots animate">
                   <div className="plant-id-dot animate slide-up delay-6"></div>
                   <div className="plant-id-dot animate slide-up delay-7"></div>
@@ -604,7 +624,17 @@ const HomePage = () => {
                   >
                   </p>
                 </div>
-                <div className="plant-id-image-content animate slide delay-5" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=600)" }}></div>
+                <div className="plant-id-image-content animate slide delay-5">
+                  <img
+                    src="/dashboard.jpg"
+                    alt="Disease Diagnoses"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                    />
+                </div>
                 <div id="dashboard-dots" className="plant-id-dots animate">
                   <div className="plant-id-dot animate slide-up delay-6"></div>
                   <div className="plant-id-dot animate slide-up delay-7"></div>
@@ -640,7 +670,17 @@ const HomePage = () => {
                   >
                   </p>
                 </div>
-                <div className="plant-id-image-content animate slide delay-5" style={{ backgroundImage: "url(https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=600)" }}></div>
+                <div className="plant-id-image-content animate slide delay-5">
+                  <img
+                    src="/marketplace.jpg"
+                    alt="Disease Diagnoses"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover"
+                    }}
+                    />
+                </div>
                 <div id="marketplace-dots" className="plant-id-dots animate">
                   <div className="plant-id-dot animate slide-up delay-6"></div>
                   <div className="plant-id-dot animate slide-up delay-7"></div>
