@@ -24,7 +24,7 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'Identification', path: '/identification' },
     { name: 'Disease Diagnosis', path: '/disease-diagnosis' },
-    { name: 'Dashboard', path: '/profile', protected: true },
+    { name: 'Dashboard', path: '/#', protected: true },
     { name: 'Marketplace', path: '/essentials' },
   ];
 
