@@ -1,3 +1,461 @@
+// import { useState, useEffect } from "react";
+// import { User, Mail, MapPin, ShoppingBag, BarChart3, Calendar, Edit3, LogOut, Plus, Trash2, Settings } from "lucide-react";
+
+// // Mock Navbar component
+// const Navbar = () => (
+//   <nav className="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100 shadow-sm">
+//     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+//       <div className="flex items-center gap-2">
+//         <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg flex items-center justify-center">
+//           <span className="text-white font-bold text-sm">A</span>
+//         </div>
+//         <span className="text-xl font-bold text-gray-900">AgroCare</span>
+//       </div>
+//       <div className="hidden md:flex items-center gap-8 text-gray-600">
+//         <a href="#" className="hover:text-emerald-600 transition-colors">Home</a>
+//         <a href="#" className="hover:text-emerald-600 transition-colors">Dashboard</a>
+//         <a href="#" className="hover:text-emerald-600 transition-colors">Marketplace</a>
+//         <a href="#" className="hover:text-emerald-600 transition-colors">Contact</a>
+//       </div>
+//     </div>
+//   </nav>
+// );
+
+// export default function Profile() {
+//   // Mock user data - replace with your actual state management
+//   const [user, setUser] = useState({
+//     id: "user123",
+//     email: "john.farmer@example.com",
+//     first_name: "John",
+//     last_name: "Farmer",
+//     role: "Agricultural Specialist",
+//     description: "Passionate about sustainable farming practices and modern agricultural technology. Helping farmers optimize their crop yields through data-driven insights.",
+//     profile_image_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=128&h=128&fit=crop&crop=face",
+//     location: "California, USA",
+//     stats: {
+//       total_scans: 247,
+//       last_scan: "2024-01-15T10:30:00Z"
+//     }
+//   });
+
+//   const [marketplaceListings, setMarketplaceListings] = useState([
+//     {
+//       _id: "listing1",
+//       title: "Organic Tomato Seeds - Premium Quality",
+//       price: 24.99,
+//       category: "Seeds",
+//       images: ["https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=200&h=200&fit=crop"]
+//     },
+//     {
+//       _id: "listing2", 
+//       title: "Natural Fertilizer - 50kg Bags",
+//       price: 89.99,
+//       category: "Fertilizer",
+//       images: ["https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=200&h=200&fit=crop"]
+//     },
+//     {
+//       _id: "listing3",
+//       title: "Professional Garden Tools Set",
+//       price: 156.50,
+//       category: "Tools",
+//       images: ["https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=200&h=200&fit=crop"]
+//     }
+//   ]);
+
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState(null);
+
+//   const handleUpdateProfile = () => {
+//     console.log("Navigate to edit profile");
+//   };
+
+//   const handleLogout = async () => {
+//     console.log("Logout user");
+//   };
+
+//   const handleEditListing = (listingId) => {
+//     console.log("Edit listing:", listingId);
+//   };
+
+//   const handleDeleteListing = async (listingId) => {
+//     if (!confirm("Are you sure you want to delete this listing?")) return;
+    
+//     setMarketplaceListings(listings => 
+//       listings.filter(listing => listing._id !== listingId)
+//     );
+//   };
+
+//   const handleCreateListing = () => {
+//     console.log("Navigate to create listing");
+//   };
+
+//   const formatDate = (dateString) => {
+//     if (!dateString) return "Never";
+//     const date = new Date(dateString);
+//     const now = new Date();
+//     const diffTime = Math.abs(now - date);
+//     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+//     if (diffDays === 1) return "Yesterday";
+//     if (diffDays < 7) return `${diffDays} days ago`;
+//     return date.toLocaleDateString("en-US", { 
+//       month: 'short', 
+//       day: 'numeric',
+//       year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+//     });
+//   };
+
+//   // Loading state
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen bg-gray-50">
+//         <Navbar />
+//         <div className="flex items-center justify-center min-h-screen pt-20">
+//           <div className="text-center">
+//             <div className="animate-spin rounded-full h-12 w-12 border-2 border-emerald-200 border-t-emerald-600 mx-auto mb-4"></div>
+//             <p className="text-gray-600 text-lg">Loading your profile...</p>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   // Error state
+//   if (error) {
+//     return (
+//       <div className="min-h-screen bg-gray-50">
+//         <Navbar />
+//         <div className="flex items-center justify-center min-h-screen pt-20">
+//           <div className="text-center max-w-md mx-auto px-6">
+//             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+//               <span className="text-red-600 text-2xl">⚠</span>
+//             </div>
+//             <h2 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h2>
+//             <p className="text-gray-600 mb-6">{error}</p>
+//             <button
+//               onClick={() => window.location.reload()}
+//               className="bg-emerald-600 text-white px-6 py-3 rounded-xl hover:bg-emerald-700 transition-colors font-medium"
+//             >
+//               Try Again
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   if (!user) {
+//     return (
+//       <div className="min-h-screen bg-gray-50">
+//         <Navbar />
+//         <div className="flex items-center justify-center min-h-screen pt-20">
+//           <div className="text-center max-w-md mx-auto px-6">
+//             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+//               <User className="w-8 h-8 text-blue-600" />
+//             </div>
+//             <h2 className="text-2xl font-bold text-gray-900 mb-2">Please log in</h2>
+//             <p className="text-gray-600 mb-6">You need to be logged in to view your profile.</p>
+//             <button
+//               onClick={() => console.log("Navigate to login")}
+//               className="bg-emerald-600 text-white px-6 py-3 rounded-xl hover:bg-emerald-700 transition-colors font-medium"
+//             >
+//               Go to Login
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="min-h-screen bg-gray-50">
+//       <Navbar />
+      
+//       {/* Hero Section - Enhanced for mobile */}
+//       <div className="pt-16 sm:pt-20">
+//         <div className="relative">
+//           {/* Cover Image */}
+//           <div className="h-32 sm:h-48 lg:h-56 relative overflow-hidden">
+//             <div 
+//               className="w-full h-full bg-cover bg-center"
+//               style={{
+//                 backgroundImage: "linear-gradient(135deg, rgba(16, 185, 129, 0.9), rgba(5, 150, 105, 0.8)), url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1200&h=400&fit=crop')"
+//               }}
+//             >
+//               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+//             </div>
+//           </div>
+          
+//           {/* Profile Section */}
+//           <div className="relative px-4 sm:px-6 lg:px-8">
+//             <div className="max-w-6xl mx-auto">
+//               <div className="relative -mt-16 sm:-mt-20 pb-6 sm:pb-8">
+//                 <div className="flex flex-col sm:flex-row sm:items-end sm:space-x-6">
+//                   {/* Profile Image */}
+//                   <div className="relative mx-auto sm:mx-0 mb-4 sm:mb-0">
+//                     <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 rounded-2xl sm:rounded-3xl border-4 border-white shadow-xl overflow-hidden bg-white">
+//                       <img
+//                         src={user.profile_image_url}
+//                         alt="Profile"
+//                         className="w-full h-full object-cover"
+//                         onError={(e) => {
+//                           e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face";
+//                         }}
+//                       />
+//                     </div>
+//                     <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 rounded-full border-4 border-white flex items-center justify-center">
+//                       <div className="w-2 h-2 bg-white rounded-full"></div>
+//                     </div>
+//                   </div>
+                  
+//                   {/* Profile Info */}
+//                   <div className="flex-1 text-center sm:text-left">
+//                     <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+//                       {user.first_name} {user.last_name}
+//                     </h1>
+//                     <p className="text-emerald-600 text-base sm:text-lg font-semibold mb-2">
+//                       {user.role}
+//                     </p>
+//                     <p className="text-gray-600 text-sm sm:text-base leading-relaxed max-w-2xl">
+//                       {user.description}
+//                     </p>
+//                   </div>
+                  
+//                   {/* Action Button - Desktop */}
+//                   <div className="hidden sm:flex gap-3">
+//                     <button
+//                       onClick={handleUpdateProfile}
+//                       className="flex items-center gap-2 bg-white text-gray-700 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors font-medium"
+//                     >
+//                       <Edit3 className="w-4 h-4" />
+//                       Edit Profile
+//                     </button>
+//                     <button
+//                       onClick={() => console.log("Settings")}
+//                       className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700 transition-colors font-medium"
+//                     >
+//                       <Settings className="w-4 h-4" />
+//                       Settings
+//                     </button>
+//                   </div>
+//                 </div>
+                
+//                 {/* Mobile Action Buttons */}
+//                 <div className="flex sm:hidden gap-2 mt-6 justify-center">
+//                   <button
+//                     onClick={handleUpdateProfile}
+//                     className="flex items-center gap-2 bg-white text-gray-700 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors font-medium text-sm"
+//                   >
+//                     <Edit3 className="w-4 h-4" />
+//                     Edit Profile
+//                   </button>
+//                   <button
+//                     onClick={() => console.log("Settings")}
+//                     className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700 transition-colors font-medium text-sm"
+//                   >
+//                     <Settings className="w-4 h-4" />
+//                     Settings
+//                   </button>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+        
+//         {/* Main Content */}
+//         <div className="px-4 sm:px-6 lg:px-8 pb-8">
+//           <div className="max-w-6xl mx-auto">
+//             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+//               {/* Left Sidebar - Account Info & Stats */}
+//               <div className="lg:col-span-1">
+//                 <div className="space-y-6">
+                  
+//                   {/* Quick Stats Cards */}
+//                   <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
+//                     <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+//                       <div className="flex items-center gap-3 mb-3">
+//                         <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+//                           <BarChart3 className="w-5 h-5 text-emerald-600" />
+//                         </div>
+//                         <div>
+//                           <h3 className="font-semibold text-gray-900">Total Scans</h3>
+//                           <p className="text-2xl font-bold text-emerald-600">{user.stats?.total_scans || 0}</p>
+//                         </div>
+//                       </div>
+//                     </div>
+                    
+//                     <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+//                       <div className="flex items-center gap-3 mb-3">
+//                         <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+//                           <ShoppingBag className="w-5 h-5 text-blue-600" />
+//                         </div>
+//                         <div>
+//                           <h3 className="font-semibold text-gray-900">Listings</h3>
+//                           <p className="text-2xl font-bold text-blue-600">{marketplaceListings.length}</p>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+                  
+//                   {/* Account Information */}
+//                   <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
+//                     <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
+//                     <div className="space-y-4">
+//                       <div className="flex items-center gap-3">
+//                         <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+//                           <Mail className="w-5 h-5 text-gray-600" />
+//                         </div>
+//                         <div className="flex-1 min-w-0">
+//                           <p className="text-sm font-medium text-gray-900">Email</p>
+//                           <p className="text-sm text-gray-600 truncate">{user.email}</p>
+//                         </div>
+//                       </div>
+                      
+//                       <div className="flex items-center gap-3">
+//                         <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+//                           <MapPin className="w-5 h-5 text-gray-600" />
+//                         </div>
+//                         <div className="flex-1 min-w-0">
+//                           <p className="text-sm font-medium text-gray-900">Location</p>
+//                           <p className="text-sm text-gray-600">{user.location || "Not set"}</p>
+//                         </div>
+//                       </div>
+                      
+//                       <div className="flex items-center gap-3">
+//                         <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center">
+//                           <Calendar className="w-5 h-5 text-gray-600" />
+//                         </div>
+//                         <div className="flex-1 min-w-0">
+//                           <p className="text-sm font-medium text-gray-900">Last Scan</p>
+//                           <p className="text-sm text-gray-600">{formatDate(user.stats?.last_scan)}</p>
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </div>
+//               </div>
+              
+//               {/* Right Content - Marketplace Listings */}
+//               <div className="lg:col-span-2">
+//                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+//                   <div className="p-4 sm:p-6 border-b border-gray-100">
+//                     <div className="flex items-center justify-between">
+//                       <h2 className="text-xl font-semibold text-gray-900">My Marketplace Listings</h2>
+//                       <button
+//                         onClick={handleCreateListing}
+//                         className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-xl hover:bg-emerald-700 transition-colors font-medium text-sm"
+//                       >
+//                         <Plus className="w-4 h-4" />
+//                         <span className="hidden sm:inline">New Listing</span>
+//                         <span className="sm:hidden">Add</span>
+//                       </button>
+//                     </div>
+//                   </div>
+                  
+//                   <div className="p-4 sm:p-6">
+//                     {marketplaceListings.length === 0 ? (
+//                       <div className="text-center py-12">
+//                         <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+//                           <ShoppingBag className="w-8 h-8 text-gray-400" />
+//                         </div>
+//                         <h3 className="text-lg font-semibold text-gray-900 mb-2">No listings yet</h3>
+//                         <p className="text-gray-600 mb-6 max-w-sm mx-auto">
+//                           Start selling your agricultural products and reach more customers.
+//                         </p>
+//                         <button
+//                           onClick={handleCreateListing}
+//                           className="bg-emerald-600 text-white px-6 py-3 rounded-xl hover:bg-emerald-700 transition-colors font-medium"
+//                         >
+//                           Create Your First Listing
+//                         </button>
+//                       </div>
+//                     ) : (
+//                       <div className="space-y-3">
+//                         {marketplaceListings.map((listing) => (
+//                           <div
+//                             key={listing._id}
+//                             className="flex items-center gap-4 p-4 border border-gray-100 rounded-2xl hover:bg-gray-50 transition-colors group"
+//                           >
+//                             {/* Product Image */}
+//                             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+//                               <img
+//                                 src={listing.images?.[0] || "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=80&h=80&fit=crop"}
+//                                 alt={listing.title}
+//                                 className="w-full h-full object-cover"
+//                                 onError={(e) => {
+//                                   e.target.src = "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=80&h=80&fit=crop";
+//                                 }}
+//                               />
+//                             </div>
+                            
+//                             {/* Product Info */}
+//                             <div className="flex-1 min-w-0">
+//                               <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate mb-1">
+//                                 {listing.title}
+//                               </h3>
+//                               <div className="flex items-center gap-3 text-xs sm:text-sm text-gray-600">
+//                                 <span className="font-semibold text-emerald-600">${listing.price}</span>
+//                                 <span className="text-gray-400">•</span>
+//                                 <span className="bg-gray-100 px-2 py-1 rounded-lg text-xs">
+//                                   {listing.category}
+//                                 </span>
+//                               </div>
+//                             </div>
+                            
+//                             {/* Actions */}
+//                             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+//                               <button
+//                                 onClick={() => handleEditListing(listing._id)}
+//                                 className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors flex items-center justify-center"
+//                                 title="Edit listing"
+//                               >
+//                                 <Edit3 className="w-4 h-4" />
+//                               </button>
+//                               <button
+//                                 onClick={() => handleDeleteListing(listing._id)}
+//                                 className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors flex items-center justify-center"
+//                                 title="Delete listing"
+//                               >
+//                                 <Trash2 className="w-4 h-4" />
+//                               </button>
+//                             </div>
+//                           </div>
+//                         ))}
+//                       </div>
+//                     )}
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+      
+//       {/* Floating Action Button - Mobile */}
+//       <div className="fixed bottom-6 right-6 sm:hidden z-40">
+//         <button
+//           onClick={handleLogout}
+//           className="w-14 h-14 bg-red-500 text-white rounded-full shadow-lg hover:bg-red-600 transition-colors flex items-center justify-center"
+//         >
+//           <LogOut className="w-6 h-6" />
+//         </button>
+//       </div>
+      
+//       {/* Desktop Logout Button */}
+//       <div className="hidden sm:block fixed bottom-6 right-6 z-40">
+//         <button
+//           onClick={handleLogout}
+//           className="flex items-center gap-2 bg-white text-gray-700 px-4 py-2 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors font-medium shadow-lg"
+//         >
+//           <LogOut className="w-4 h-4" />
+//           Logout
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Navbar from "@/components/Navbar";

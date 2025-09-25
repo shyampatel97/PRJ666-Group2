@@ -115,7 +115,7 @@ const authOptions = {
             last_name: user.last_name,
             location: user.location,
             role: user.role,
-            description: user.description
+            description: user.description,
           };
         } catch (error) {
           console.error("Auth error:", error);
@@ -195,63 +195,66 @@ const authOptions = {
       }
       return true;
     },
-    // Updated JWT callback in pages/api/auth/[...nextauth].js
-async jwt({ token, user, account, trigger, session }) {
-  // Skip database operations in test environment
-  if (process.env.NODE_ENV === "test") {
-    if (user) {
-      token.userId = user.id;
-      token.first_name = user.first_name;
-      token.last_name = user.last_name;
-      token.location = user.location;
-      token.profile_image_url = user.image;
-    }
-    return token;
-  }
 
-  // Always refresh user data on any JWT update (including profile updates)
-  if (trigger === 'update' || user) {
-    try {
-      await dbConnect();
-      
-      // For update triggers, use the email from token, for new logins use user.email
-      const email = user?.email || token.email;
-      
-      const dbUser = await User.findOne({ email });
-      
-      if (dbUser) {
-        console.log("Refreshing JWT token with fresh user data for:", dbUser.email);
-        token.userId = dbUser._id.toString();
-        token.first_name = dbUser.first_name;
-        token.last_name = dbUser.last_name;
-        token.location = dbUser.location;
-        token.profile_image_url = dbUser.profile_image_url;
-        token.role = dbUser.role;
-        token.description = dbUser.description;
-        token.email = dbUser.email;
-        
-        // Update the name field for consistency
-        token.name = `${dbUser.first_name} ${dbUser.last_name}`;
-      } else if (user) {
-        // Fallback for new users
-        token.userId = user.id;
-        token.first_name = user.first_name;
-        token.last_name = user.last_name;
-        token.location = user.location;
-        token.profile_image_url = user.image;
-        token.role = user.role;
-        token.description = user.description;
-        token.email = user.email;
-        token.name = user.name;
+    async jwt({ token, user, account, trigger, session }) {
+      // Skip database operations in test environment
+      if (process.env.NODE_ENV === "test") {
+        if (user) {
+          token.userId = user.id;
+          token.first_name = user.first_name;
+          token.last_name = user.last_name;
+          token.location = user.location;
+          token.profile_image_url = user.image;
+        }
+        return token;
       }
-    } catch (error) {
-      console.error("Error refreshing JWT token:", error);
-      // Don't fail the entire auth process, just log the error
-    }
-  }
 
-  return token;
-},
+      // Always refresh user data on any JWT update (including profile updates)
+      if (trigger === "update" || user) {
+        try {
+          await dbConnect();
+
+          // For update triggers, use the email from token, for new logins use user.email
+          const email = user?.email || token.email;
+
+          const dbUser = await User.findOne({ email });
+
+          if (dbUser) {
+            console.log(
+              "Refreshing JWT token with fresh user data for:",
+              dbUser.email
+            );
+            token.userId = dbUser._id.toString();
+            token.first_name = dbUser.first_name;
+            token.last_name = dbUser.last_name;
+            token.location = dbUser.location;
+            token.profile_image_url = dbUser.profile_image_url;
+            token.role = dbUser.role;
+            token.description = dbUser.description;
+            token.email = dbUser.email;
+
+            // Update the name field for consistency
+            token.name = `${dbUser.first_name} ${dbUser.last_name}`;
+          } else if (user) {
+            // Fallback for new users
+            token.userId = user.id;
+            token.first_name = user.first_name;
+            token.last_name = user.last_name;
+            token.location = user.location;
+            token.profile_image_url = user.image;
+            token.role = user.role;
+            token.description = user.description;
+            token.email = user.email;
+            token.name = user.name;
+          }
+        } catch (error) {
+          console.error("Error refreshing JWT token:", error);
+          // Don't fail the entire auth process, just log the error
+        }
+      }
+
+      return token;
+    },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.userId;
@@ -261,9 +264,10 @@ async jwt({ token, user, account, trigger, session }) {
         session.user.profile_image_url = token.profile_image_url;
         session.user.role = token.role;
         session.user.description = token.description;
-        
+
         // Update the name and image for consistency
-        session.user.name = token.name || `${token.first_name} ${token.last_name}`;
+        session.user.name =
+          token.name || `${token.first_name} ${token.last_name}`;
         session.user.image = token.profile_image_url;
       }
 
@@ -283,8 +287,8 @@ async jwt({ token, user, account, trigger, session }) {
     async updateUser(message) {
       // This event is triggered when user data is updated
       console.log("NextAuth updateUser event:", message);
-    }
-  }
+    },
+  },
 };
 
 export default NextAuth(authOptions);

@@ -1,4 +1,6 @@
 // pages/api/auth/forgot-password.js
+
+// TO-DO --- need to add security step in email also resent OTP. 
 import {dbConnect} from '../../../lib/dbConnect';
 import User from '../../../models/User';
 import nodemailer from 'nodemailer';
@@ -40,7 +42,8 @@ export default async function handler(req, res) {
       from: process.env.GMAIL_USER,
       to: email,
       subject: 'Password Reset OTP - AgroCare',
-      html: `<h2>Password Reset OTP</h2><p>Your OTP: <strong>${otp}</strong></p><p>Expires in 10 minutes.</p>`
+      html: `<h2>Password Reset OTP</h2><p>Your OTP: <strong>${otp}</strong></p><p>Expires in 10 minutes.</p>
+      <h5>Please do not share this OTP with anyone</h5>`
     });
 
     res.status(200).json({ message: 'OTP sent', email });
