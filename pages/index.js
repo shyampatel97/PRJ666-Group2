@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Leaf, Bug, BarChart3, Store, ArrowRight, LeafIcon } from "lucide-react";
+import {
+  Leaf,
+  Bug,
+  BarChart3,
+  Store,
+  ArrowRight,
+  LeafIcon,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 
 const HomePage = () => {
@@ -207,15 +214,21 @@ const HomePage = () => {
           display: flex;
           flex-wrap: nowrap;
           justify-content: space-between;
-          width: 100%; 
+          width: 100%;
           max-width: 800px;
-          height: 500px;
+          height: 350px;
           margin: 0 auto;
-          border: 1px solid white; 
+          border: 1px solid white;
           border-radius: 20px;
           transition: 0.3s ease-in-out;
           position: relative;
           overflow: hidden;
+        }
+        #plant-identification-card,
+        #disease-diagnosis-card,
+        #dashboard-card,
+        #marketplace-card {
+          box-shadow: 8px 8px 12px rgba(0, 0, 0, 0.3);
         }
         .plant-id-overlay {
           position: relative;
@@ -234,13 +247,13 @@ const HomePage = () => {
           width: 100%;
           height: 500%;
           padding: 0.5rem 0 0 0.5rem;
-          border: 3px solid;
           border-image: linear-gradient(
-            to bottom,
-            #aea724 5%,
-            forestgreen 35% 65%,
-            #aea724 95%
-          ) 0 0 0 100%;
+              to bottom,
+              #aea724 5%,
+              forestgreen 35% 65%,
+              #aea724 95%
+            )
+            0 0 0 100%;
           transition: 0.3s ease-in-out 0.2s;
           z-index: 1;
         }
@@ -518,36 +531,42 @@ const HomePage = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             {/* Plant Identification */}
-            <div id="plant-identification-card" className="plant-id-wrap animate pop">
-              <div id="plant-identification-overlay" className="plant-id-overlay">
-                <div id="plant-identification-content" className="plant-id-overlay-content animate slide-left delay-2">
-                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-white text-center">
+            <div
+              id="plant-identification-card"
+              className="plant-id-wrap animate pop"
+            >
+              <div
+                id="plant-identification-overlay"
+                className="plant-id-overlay"
+              >
+                <div
+                  id="plant-identification-content"
+                  className="plant-id-overlay-content animate slide-left delay-2"
+                >
+                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-black text-center">
                     Plant Identification
                   </h3>
                   <p
                     className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
                     style={{ marginBottom: "1.5rem" }}
-                  >
-                  </p>
+                  ></p>
                 </div>
                 <div className="plant-id-image-content animate slide delay-5">
-                 <img
+                  <img
                     src="/plant-identify.JPG"
-                    alt="Disease Diagnoses"
+                    alt="Plant Identification"
                     style={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "cover"
+                      objectFit: "cover",
                     }}
-                    />
-                </div>
-                <div id="plant-identification-dots" className="plant-id-dots animate">
-                  <div className="plant-id-dot animate slide-up delay-6"></div>
-                  <div className="plant-id-dot animate slide-up delay-7"></div>
-                  <div className="plant-id-dot animate slide-up delay-8"></div>
+                  />
                 </div>
               </div>
-              <div id="plant-identification-text" className="plant-id-text text-justify">
+              <div
+                id="plant-identification-text"
+                className="plant-id-text text-justify"
+              >
                 <p className="text-xs md:text-sm leading-relaxed mb-2">
                   Detect diseases before they spread. With just a photo, our AI
                   can identify common crop diseases and alert you to early signs
@@ -566,36 +585,39 @@ const HomePage = () => {
             </div>
 
             {/* Disease Diagnosis */}
-            <div id="disease-diagnosis-card" className="plant-id-wrap animate pop">
+            <div
+              id="disease-diagnosis-card"
+              className="plant-id-wrap animate pop"
+            >
               <div id="disease-diagnosis-overlay" className="plant-id-overlay">
-                <div id="disease-diagnosis-content" className="plant-id-overlay-content animate slide-left delay-2">
-                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-white text-center">
+                <div
+                  id="disease-diagnosis-content"
+                  className="plant-id-overlay-content animate slide-left delay-2"
+                >
+                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-black text-center">
                     Disease Diagnosis
                   </h3>
                   <p
                     className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
                     style={{ marginBottom: "1.5rem" }}
-                  >
-                  </p>
+                  ></p>
                 </div>
                 <div className="plant-id-image-content animate slide delay-5">
-                <img
+                  <img
                     src="/disease-diagnoses.JPG"
-                    alt="Disease Diagnoses"
+                    alt="Disease Diagnosis"
                     style={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "cover"
+                      objectFit: "cover",
                     }}
-                    />
-                </div>
-                <div id="disease-diagnosis-dots" className="plant-id-dots animate">
-                  <div className="plant-id-dot animate slide-up delay-6"></div>
-                  <div className="plant-id-dot animate slide-up delay-7"></div>
-                  <div className="plant-id-dot animate slide-up delay-8"></div>
+                  />
                 </div>
               </div>
-              <div id="disease-diagnosis-text" className="plant-id-text text-justify">
+              <div
+                id="disease-diagnosis-text"
+                className="plant-id-text text-justify"
+              >
                 <p className="text-xs md:text-sm leading-relaxed mb-2">
                   Detect diseases before they spread. Our AI analyzes photos to
                   identify crop diseases and provides early warnings.
@@ -614,31 +636,28 @@ const HomePage = () => {
             {/* Dashboard */}
             <div id="dashboard-card" className="plant-id-wrap animate pop">
               <div id="dashboard-overlay" className="plant-id-overlay">
-                <div id="dashboard-content" className="plant-id-overlay-content animate slide-left delay-2">
-                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-white text-center">
+                <div
+                  id="dashboard-content"
+                  className="plant-id-overlay-content animate slide-left delay-2"
+                >
+                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-black text-center">
                     Dashboard
                   </h3>
                   <p
                     className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
                     style={{ marginBottom: "1.5rem" }}
-                  >
-                  </p>
+                  ></p>
                 </div>
                 <div className="plant-id-image-content animate slide delay-5">
                   <img
                     src="/dashboard.JPG"
-                    alt="Disease Diagnoses"
+                    alt="Dashboard"
                     style={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "cover"
+                      objectFit: "cover",
                     }}
-                    />
-                </div>
-                <div id="dashboard-dots" className="plant-id-dots animate">
-                  <div className="plant-id-dot animate slide-up delay-6"></div>
-                  <div className="plant-id-dot animate slide-up delay-7"></div>
-                  <div className="plant-id-dot animate slide-up delay-8"></div>
+                  />
                 </div>
               </div>
               <div id="dashboard-text" className="plant-id-text text-justify">
@@ -660,31 +679,28 @@ const HomePage = () => {
             {/* Marketplace */}
             <div id="marketplace-card" className="plant-id-wrap animate pop">
               <div id="marketplace-overlay" className="plant-id-overlay">
-                <div id="marketplace-content" className="plant-id-overlay-content animate slide-left delay-2">
-                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-white text-center">
+                <div
+                  id="marketplace-content"
+                  className="plant-id-overlay-content animate slide-left delay-2"
+                >
+                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-green text-center">
                     Marketplace
                   </h3>
                   <p
                     className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
                     style={{ marginBottom: "1.5rem" }}
-                  >
-                  </p>
+                  ></p>
                 </div>
                 <div className="plant-id-image-content animate slide delay-5">
                   <img
                     src="/marketplace.JPG"
-                    alt="Disease Diagnoses"
+                    alt="Marketplace"
                     style={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "cover"
+                      objectFit: "cover",
                     }}
-                    />
-                </div>
-                <div id="marketplace-dots" className="plant-id-dots animate">
-                  <div className="plant-id-dot animate slide-up delay-6"></div>
-                  <div className="plant-id-dot animate slide-up delay-7"></div>
-                  <div className="plant-id-dot animate slide-up delay-8"></div>
+                  />
                 </div>
               </div>
               <div id="marketplace-text" className="plant-id-text text-justify">
