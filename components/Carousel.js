@@ -64,10 +64,10 @@ const Carousel = () => {
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-[#1c352d] mb-2">
+        <h2 className="text-5xl font-bold text-[#fefae0] mb-2">
           Plant Gallery
         </h2>
-        <p className="text-gray-600">
+        <p className="text-white -600 text-xl">
           Explore our collection of diverse plant species
         </p>
       </div>

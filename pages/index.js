@@ -8,6 +8,8 @@ import {
   LeafIcon,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import Carousel from "@/components/Carousel";
+
 
 const HomePage = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -40,7 +42,7 @@ const HomePage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{ backgroundColor: "#283618" }}>
       <Navbar />
       <style jsx>{`
         @keyframes fadeInUp {
@@ -209,7 +211,7 @@ const HomePage = () => {
           object-fit: cover;
           display: block;
         }
-        /* Updated Plant ID Card Styles */
+        /* Updated Plant ID Card Styles - Adjusted for palette */
         .plant-id-wrap {
           display: flex;
           flex-wrap: nowrap;
@@ -218,7 +220,7 @@ const HomePage = () => {
           max-width: 800px;
           height: 350px;
           margin: 0 auto;
-          border: 1px solid white;
+          border: 1px solid #283618; /* Dark Olive Green Border */
           border-radius: 20px;
           transition: 0.3s ease-in-out;
           position: relative;
@@ -236,7 +238,7 @@ const HomePage = () => {
           width: 100%;
           height: 100%;
           padding: 1rem 0.75rem;
-          background: #186218;
+          background: #283618; /* Dark Olive Green Overlay */
           transition: 0.4s ease-in-out;
           z-index: 1;
         }
@@ -249,9 +251,9 @@ const HomePage = () => {
           padding: 0.5rem 0 0 0.5rem;
           border-image: linear-gradient(
               to bottom,
-              #aea724 5%,
-              forestgreen 35% 65%,
-              #aea724 95%
+              #b38a58 5%, /* Tan/Brown Accent */
+              #283618 35% 65%, /* Dark Olive Green */
+              #b38a58 95% /* Tan/Brown Accent */
             )
             0 0 0 100%;
           transition: 0.3s ease-in-out 0.2s;
@@ -282,8 +284,8 @@ const HomePage = () => {
         .plant-id-dot {
           width: 10px;
           height: 10px;
-          background: yellow;
-          border: 1px solid indigo;
+          background: #b38a58; /* Tan/Brown Dot */
+          border: 1px solid #283618; /* Dark Olive Green Border */
           border-radius: 50%;
           margin: 5px 0;
           transition: 0.3s ease-in-out 0.3s;
@@ -292,17 +294,18 @@ const HomePage = () => {
           position: absolute;
           top: 0;
           right: 0;
-          width: 100%;
-          height: 100%;
+          width: calc(100% - 2rem);
+          height: calc(100% - 2rem);
           margin: 1rem;
           padding: 1.5rem;
-          background: #fff;
+          background: #f0ead2; /* Light Beige/Cream Text Background */
           font-size: max(10pt, 2vmin);
           line-height: 1.5;
-          color: #0e390e;
+          color: #283618; /* Dark Olive Green Text Color */
           display: flex;
           flex-direction: column;
           justify-content: center;
+          border-radius: 20px;
         }
         .plant-id-inset {
           max-width: 50%;
@@ -329,7 +332,7 @@ const HomePage = () => {
           transform: translateY(50%) translateX(1rem);
         }
         .plant-id-wrap:hover .plant-id-dot {
-          background: white;
+          background: #283618; /* Dark Olive Green Dot on hover */
         }
       `}</style>
 
@@ -342,12 +345,15 @@ const HomePage = () => {
 
         <div className="relative max-w-7xl mx-auto px-6 py-20 lg:py-32 h-full flex items-center">
           <div className="max-w-2xl">
-            <h1 className="text-5xl lg:text-6xl font-bold text-black leading-tight mb-6">
+            <h1
+              className="text-5xl lg:text-6xl font-bold leading-tight mb-6"
+              style={{ color: "#582f0e" }}
+            >
               Smart Solutions
               <br />
               For Modern Farming
             </h1>
-            <p className="text-xl text-white leading-relaxed mb-8 max-w-lg">
+            <p className="text-xl text-black leading-relaxed mb-8 max-w-lg">
               Empowering farmers with AI-driven tools for crop management and
               disease identification
             </p>
@@ -361,7 +367,7 @@ const HomePage = () => {
       </section>
 
       {/* Mission Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-283618">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             {/* Left Content */}
@@ -374,7 +380,7 @@ const HomePage = () => {
                     fontSize: "40px",
                     letterSpacing: "-1.6px",
                     wordSpacing: "-2.6px",
-                    color: "#000000",
+                    color: "#f0ead2",
                     fontWeight: 400,
                     textDecoration: "rgb(68, 68, 68)",
                     fontStyle: "normal",
@@ -394,12 +400,15 @@ const HomePage = () => {
                     fontFamily: '"Arial", Gadget, sans-serif',
                     fontSize: "18px",
                     fontWeight: 400,
-                    color: "#4B5563",
+                    color: "#fefae0",
                     lineHeight: "1.8",
                   }}
                 >
-                  At <span className="font-bold text-green-800">AgroCare</span>,
-                  we are dedicated to supporting the agriculture industry
+                  At{" "}
+                  <span className="font-bold" style={{ color: "#b38a58" }}>
+                    AgroCare
+                  </span>
+                  , we are dedicated to supporting the agriculture industry
                   through smart, user-friendly technology. Our AI-powered
                   platform delivers farmers and agricultural professionals
                   timely, practical insights for monitoring crop health. From
@@ -526,9 +535,15 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Services Section (Grid Layout) */}
-      <section className="py-20 bg-white-50">
+      {/* Services Section (Grid Layout) - REDESIGNED */}
+      <section className="py-20" style={{ backgroundColor: "#fffef7ff" }}>
         <div className="max-w-7xl mx-auto px-6">
+          <h1
+            className="text-4xl lg:text-5xl font-bold text-center mb-16"
+            style={{ color: "#283618" }} /* Dark Olive Green Text */
+          >
+            Our Services
+          </h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             {/* Plant Identification */}
             <div
@@ -544,6 +559,7 @@ const HomePage = () => {
                   className="plant-id-overlay-content animate slide-left delay-2"
                 >
                   <h3 className="animate slide-left pop delay-4 text-xl font-bold text-black text-center">
+                    {/* Changed text color to white for contrast on dark green */}
                     Plant Identification
                   </h3>
                   <p
@@ -568,6 +584,8 @@ const HomePage = () => {
                 className="plant-id-text text-justify"
               >
                 <p className="text-xs md:text-sm leading-relaxed mb-2">
+                  <br />
+                  <br />
                   Detect diseases before they spread. With just a photo, our AI
                   can identify common crop diseases and alert you to early signs
                   of trouble.
@@ -576,10 +594,6 @@ const HomePage = () => {
                   Prevent loss, protect your harvest, and act fast with
                   science-backed solutions. Our platform empowers farmers with
                   precise plant identification.
-                </p>
-                <p className="text-xs md:text-sm leading-relaxed">
-                  Built for ease, our tool ensures you can monitor crop health
-                  effectively and sustainably.
                 </p>
               </div>
             </div>
@@ -595,6 +609,7 @@ const HomePage = () => {
                   className="plant-id-overlay-content animate slide-left delay-2"
                 >
                   <h3 className="animate slide-left pop delay-4 text-xl font-bold text-black text-center">
+                    {/* Changed text color to white for contrast on dark green */}
                     Disease Diagnosis
                   </h3>
                   <p
@@ -605,7 +620,7 @@ const HomePage = () => {
                 <div className="plant-id-image-content animate slide delay-5">
                   <img
                     src="/disease-diagnoses.JPG"
-                    alt="Disease Diagnosis"
+                    alt="Disease Diagnoses"
                     style={{
                       width: "100%",
                       height: "100%",
@@ -626,10 +641,6 @@ const HomePage = () => {
                   Take action quickly with expert recommendations to protect
                   your harvest and reduce losses.
                 </p>
-                <p className="text-xs md:text-sm leading-relaxed">
-                  Designed for efficiency, ensuring timely and accurate
-                  diagnostics for sustainable farming.
-                </p>
               </div>
             </div>
 
@@ -641,6 +652,7 @@ const HomePage = () => {
                   className="plant-id-overlay-content animate slide-left delay-2"
                 >
                   <h3 className="animate slide-left pop delay-4 text-xl font-bold text-black text-center">
+                    {/* Changed text color to white for contrast on dark green */}
                     Dashboard
                   </h3>
                   <p
@@ -651,7 +663,7 @@ const HomePage = () => {
                 <div className="plant-id-image-content animate slide delay-5">
                   <img
                     src="/dashboard.JPG"
-                    alt="Dashboard"
+                    alt="Disease Diagnoses"
                     style={{
                       width: "100%",
                       height: "100%",
@@ -683,7 +695,8 @@ const HomePage = () => {
                   id="marketplace-content"
                   className="plant-id-overlay-content animate slide-left delay-2"
                 >
-                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-green text-center">
+                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-black text-center">
+                    {/* Changed text color to white for contrast on dark green */}
                     Marketplace
                   </h3>
                   <p
@@ -694,7 +707,7 @@ const HomePage = () => {
                 <div className="plant-id-image-content animate slide delay-5">
                   <img
                     src="/marketplace.JPG"
-                    alt="Marketplace"
+                    alt="Disease Diagnoses"
                     style={{
                       width: "100%",
                       height: "100%",
@@ -741,6 +754,11 @@ const HomePage = () => {
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
+      </section>
+
+      {/* Plant Gallery Carousel */}
+      <section style={{ backgroundColor: "#283618" }}>
+        <Carousel />
       </section>
     </div>
   );
