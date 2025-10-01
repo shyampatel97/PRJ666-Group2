@@ -234,7 +234,7 @@ export default function Profile() {
         className="relative h-24 md:h-36 bg-cover bg-center"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1200&h=400&fit=crop')",
+            "url('/profile-background.png')",
         }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-30"></div>
