@@ -1,23 +1,23 @@
-// pages/identification.js - UPDATED WITH CAMERA FEATURE
+// pages/identification.js - COMPLETE VERSION WITH AI DETAILS
 
 import React, { useState, useEffect } from 'react';
 import { Upload, Camera, Loader2, Leaf, Info, CheckCircle, AlertCircle, Search, X } from 'lucide-react';
+import { Droplet, Sun , Heart,  Lightbulb, Sparkles } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import ChatBot from '@/components/Chatbot';
 
 // Unified Upload Component with Half-Width Options
 const UnifiedUploadComponent = ({ onImageSelect, onClear, imagePreview }) => {
   const [showCamera, setShowCamera] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
   const [stream, setStream] = useState(null);
   const videoRef = React.useRef(null);
   const canvasRef = React.useRef(null);
 
-  // Start camera
   const startCamera = async () => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'environment', // Use back camera on mobile
+          facingMode: 'environment',
           width: { ideal: 1280 },
           height: { ideal: 720 }
         }
@@ -25,7 +25,6 @@ const UnifiedUploadComponent = ({ onImageSelect, onClear, imagePreview }) => {
       
       setStream(mediaStream);
       setShowCamera(true);
-      setShowOptions(false);
       
       setTimeout(() => {
         if (videoRef.current) {
@@ -38,7 +37,6 @@ const UnifiedUploadComponent = ({ onImageSelect, onClear, imagePreview }) => {
     }
   };
 
-  // Stop camera
   const stopCamera = () => {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
@@ -47,7 +45,6 @@ const UnifiedUploadComponent = ({ onImageSelect, onClear, imagePreview }) => {
     setShowCamera(false);
   };
 
-  // Capture photo
   const capturePhoto = () => {
     if (!videoRef.current || !canvasRef.current) return;
 
@@ -72,17 +69,14 @@ const UnifiedUploadComponent = ({ onImageSelect, onClear, imagePreview }) => {
     }, 'image/jpeg', 0.9);
   };
 
-  // Handle file input
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
     if (file) {
       const previewUrl = URL.createObjectURL(file);
       onImageSelect(file, previewUrl);
-      setShowOptions(false);
     }
   };
 
-  // Cleanup camera on unmount
   React.useEffect(() => {
     return () => {
       if (stream) {
@@ -91,7 +85,6 @@ const UnifiedUploadComponent = ({ onImageSelect, onClear, imagePreview }) => {
     };
   }, [stream]);
 
-  // Camera Modal
   if (showCamera) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
@@ -133,12 +126,10 @@ const UnifiedUploadComponent = ({ onImageSelect, onClear, imagePreview }) => {
     );
   }
 
-  // Upload interface
   return (
     <div className="relative">
       {!imagePreview ? (
         <div className="relative">
-          {/* Hidden file input */}
           <input
             type="file"
             accept="image/*"
@@ -147,10 +138,8 @@ const UnifiedUploadComponent = ({ onImageSelect, onClear, imagePreview }) => {
             id="image-upload"
           />
           
-          {/* Direct Options - Half width layout */}
           <div className="border border-gray-200 rounded-xl shadow-sm overflow-hidden bg-white">
             <div className="grid grid-cols-2">
-              {/* Upload Option - Left Half */}
               <label 
                 htmlFor="image-upload" 
                 className="flex flex-col items-center px-6 py-8 hover:bg-green-100 cursor-pointer transition-colors border-r border-gray-200"
@@ -164,7 +153,6 @@ const UnifiedUploadComponent = ({ onImageSelect, onClear, imagePreview }) => {
                 </div>
               </label>
               
-              {/* Camera Option - Right Half */}
               <button 
                 onClick={startCamera}
                 className="flex flex-col items-center px-6 py-8 hover:bg-green-100 transition-colors"
@@ -195,11 +183,235 @@ const UnifiedUploadComponent = ({ onImageSelect, onClear, imagePreview }) => {
           </button>
         </div>
       )}
-      
-      {/* Click outside to close options - Remove this since we no longer have dropdown */}
     </div>
   );
 };
+
+const PlantCard = ({ plant, isMainResult = false, index = 0, activeTab }) => {
+  const [imageError, setImageError] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  let images = [];
+  if (plant.similar_images && plant.similar_images.length > 0) {
+    images = plant.similar_images;
+  }
+  
+  const hasValidImage = images.length > 0 && !imageError;
+  const currentImage = hasValidImage ? images[currentImageIndex] : null;
+  
+  const handleImageError = () => {
+    if (currentImageIndex < images.length - 1) {
+      setCurrentImageIndex(currentImageIndex + 1);
+    } else {
+      setImageError(true);
+    }
+  };
+
+  const confidence = isMainResult ? plant.confidence : plant.probability;
+  const confidenceColor = isMainResult ? 'green' : 'blue';
+
+  return (
+    <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+      <div className="aspect-square bg-gray-100 relative">
+        {hasValidImage && currentImage ? (
+          <img
+            src={currentImage.url}
+            alt={plant.name || plant.identified_name}
+            className="w-full h-full object-cover"
+            onError={handleImageError}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
+            <div className="text-center">
+              <Leaf className="w-12 h-12 text-green-400 mx-auto mb-2" />
+              <p className="text-xs text-green-600 font-medium px-2">
+                {plant.name || plant.identified_name}
+              </p>
+            </div>
+          </div>
+        )}
+        <div className={`absolute top-2 left-2 bg-${confidenceColor}-500 text-white px-2 py-1 rounded text-xs font-bold`}>
+          {(confidence * 100).toFixed(0)}%
+        </div>
+        
+        {images.length > 1 && (
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
+            {images.map((_, imgIndex) => (
+              <button
+                key={imgIndex}
+                onClick={() => setCurrentImageIndex(imgIndex)}
+                className={`w-2 h-2 rounded-full ${
+                  imgIndex === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="p-4">
+        <div className="mb-2">
+          <span className="text-sm text-gray-500">Name:</span>
+          <span className="text-orange-500 font-semibold ml-1">
+            {plant.name || plant.identified_name}
+          </span>
+        </div>
+        <div className="mb-2">
+          <span className="text-sm text-gray-500">Category:</span>
+          <span className={`bg-${confidenceColor}-100 text-${confidenceColor}-800 px-2 py-0.5 rounded text-xs font-medium ml-2`}>
+            {plant.category || activeTab}
+          </span>
+        </div>
+        <div>
+          <span className="text-sm text-gray-500">Match Confidence:</span>
+          <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+            <div 
+              className={`bg-${confidenceColor}-400 h-2 rounded-full transition-all duration-500`}
+              style={{ width: `${(confidence * 100)}%` }}
+            ></div>
+          </div>
+          <span className="text-xs text-gray-500">{(confidence * 100).toFixed(0)}%</span>
+        </div>
+        
+        {images.length > 0 && (
+          <div className="mt-2 text-xs text-gray-500">
+            {images.length} similar image{images.length !== 1 ? 's' : ''} available
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const PlantDetailsCard = ({ details, loading, plantName }) => {
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="flex items-center justify-center space-x-3">
+          <Loader2 className="w-6 h-6 animate-spin text-green-600" />
+          <p className="text-gray-600">Getting detailed plant information...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!details) return null;
+
+  return (
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* Header with Plant Name - Full Width */}
+      <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl shadow-lg p-8 text-white">
+        <div className="flex items-center space-x-3 mb-3">
+          <Leaf className="w-8 h-8" />
+          <h1 className="text-3xl font-bold">{plantName}</h1>
+        </div>
+        <p className="text-green-50 leading-relaxed">{details.description}</p>
+      </div>
+
+      {/* Desktop: Two Column Layout, Mobile: Single Column */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        
+        {/* Left Column - 40% width on desktop */}
+        <div className="lg:col-span-2 space-y-6">
+          
+          {/* What Does It Look Like Section */}
+          <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <Leaf className="w-5 h-5 text-green-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-800">What Does It Look Like?</h2>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <span className="font-semibold text-green-600 block mb-1">Leaves:</span>
+                <p className="text-gray-700 text-sm">{details.appearance.leaves}</p>
+              </div>
+              <div>
+                <span className="font-semibold text-pink-600 block mb-1">Flowers:</span>
+                <p className="text-gray-700 text-sm">{details.appearance.flowers}</p>
+              </div>
+              <div>
+                <span className="font-semibold text-amber-600 block mb-1">Growth:</span>
+                <p className="text-gray-700 text-sm">{details.appearance.growth}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Where It Grows Best */}
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl shadow-md border border-orange-200 p-6">
+            <div className="flex items-center space-x-2 mb-3">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <Sun className="w-5 h-5 text-orange-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-800">Where It Grows Best</h2>
+            </div>
+            <p className="text-gray-700 leading-relaxed text-sm">{details.ideal_conditions}</p>
+          </div>
+
+          {/* Fun Fact */}
+          <div className="bg-gradient-to-r from-yellow-50 to-amber-50 rounded-2xl shadow-md border-2 border-yellow-300 p-6">
+            <div className="flex items-center space-x-2 mb-3">
+              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-yellow-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-800">Fun Fact</h2>
+            </div>
+            <p className="text-gray-700 leading-relaxed text-sm">{details.fun_fact}</p>
+          </div>
+
+        </div>
+
+        {/* Right Column - 60% width on desktop */}
+        <div className="lg:col-span-3 space-y-6">
+          
+          {/* Why People Love It */}
+          <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl shadow-md border border-pink-200 p-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
+                <Heart className="w-5 h-5 text-pink-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-800">Why People Love It</h2>
+            </div>
+            <ul className="space-y-2">
+              {details.why_people_love_it.map((reason, index) => (
+                <li key={index} className="flex items-start space-x-3">
+                  <span className="text-pink-500 mt-1 text-lg">•</span>
+                  <span className="text-gray-700 text-sm">{reason}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Care Tips */}
+          <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Droplet className="w-5 h-5 text-blue-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-800">Tips for Healthy Growth</h2>
+            </div>
+            <div className="space-y-3">
+              {details.care_tips.map((tip, index) => (
+                <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div className="mt-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-800 mb-1 text-sm">{tip.title}</h3>
+                    <p className="text-gray-600 text-sm">{tip.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
 const IdentificationPage = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -210,48 +422,37 @@ const IdentificationPage = () => {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('Plants');
   const [searchQuery, setSearchQuery] = useState('');
+  const [plantDetails, setPlantDetails] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
-  // Get user info on component mount
-// Just replace your useEffect block with:
-useEffect(() => {
-  fetch("/api/auth/session")
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("Session response:", data); // Debug log
-      
-      if (data && data.user) {
-        setUser({
-          id: data.user.id,
-          email: data.user.email,
-          first_name: data.user.first_name || data.user.name?.split(' ')[0],
-          last_name: data.user.last_name || data.user.name?.split(' ').slice(1).join(' '),
-          profile_image_url: data.user.profile_image_url || data.user.image,
-          location: data.user.location
-        });
-      }
-    })
-    .catch((error) => {
-      console.error("Auth error:", error);
-    });
-}, []);
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.user) {
+          setUser({
+            id: data.user.id,
+            email: data.user.email,
+            first_name: data.user.first_name || data.user.name?.split(' ')[0],
+            last_name: data.user.last_name || data.user.name?.split(' ').slice(1).join(' '),
+            profile_image_url: data.user.profile_image_url || data.user.image,
+            location: data.user.location
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Auth error:", error);
+      });
+  }, []);
 
-  // Updated handleImageSelect to work with camera
   const handleImageSelect = (file, previewUrl) => {
     setSelectedImage(file);
     setImagePreview(previewUrl);
     setResult(null);
     setError(null);
+    setPlantDetails(null);
   };
 
-  // Updated handleFileSelect for file input
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      handleImageSelect(file, URL.createObjectURL(file));
-    }
-  };
-
-  // Upload image using your existing upload API
   const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -275,11 +476,29 @@ useEffect(() => {
     }
   };
 
-  // Handle the complete identification process
+  const fetchPlantDetails = async (plantName) => {
+    setLoadingDetails(true);
+    try {
+      const response = await fetch('/api/get-plant-details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ plantName }),
+      });
+
+      const data = await response.json();
+      setPlantDetails(data.details);
+    } catch (error) {
+      console.error('Error fetching plant details:', error);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
   const handleIdentifyPlant = async () => {
     if (!selectedImage) return;
 
-    // Check if user is logged in
     if (!user) {
       setError("Please log in to identify plants");
       return;
@@ -289,13 +508,11 @@ useEffect(() => {
     setError(null);
 
     try {
-      // Upload image using your existing system
       const imageUrl = await uploadImage(selectedImage);
       
       setUploading(false);
       setIdentifying(true);
 
-      // Create identification record and get results
       const response = await fetch('/api/identify-plant', {
         method: 'POST',
         headers: {
@@ -314,6 +531,12 @@ useEffect(() => {
 
       const identificationResult = await response.json();
       setResult(identificationResult);
+      
+      // Fetch AI-generated plant details
+      if (identificationResult.identified && identificationResult.identified_name) {
+        await fetchPlantDetails(identificationResult.identified_name);
+      }
+      
       console.log('Identification Result:', identificationResult);
     } catch (error) {
       setError(error.message);
@@ -323,110 +546,12 @@ useEffect(() => {
     }
   };
 
-  // Clear current image and results
   const clearImage = () => {
     setSelectedImage(null);
     setImagePreview(null);
     setResult(null);
     setError(null);
-  };
-
-  // Component to handle individual plant cards
-  const PlantCard = ({ plant, isMainResult = false, index = 0 }) => {
-    const [imageError, setImageError] = useState(false);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    
-    // Get images array - try multiple sources
-    let images = [];
-    if (plant.similar_images && plant.similar_images.length > 0) {
-      images = plant.similar_images;
-    }
-    
-    const hasValidImage = images.length > 0 && !imageError;
-    const currentImage = hasValidImage ? images[currentImageIndex] : null;
-    
-    const handleImageError = () => {
-      console.log('Image failed to load:', currentImage?.url);
-      if (currentImageIndex < images.length - 1) {
-        setCurrentImageIndex(currentImageIndex + 1);
-      } else {
-        setImageError(true);
-      }
-    };
-
-    const confidence = isMainResult ? plant.confidence : plant.probability;
-    const confidenceColor = isMainResult ? 'green' : 'blue';
-
-    return (
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-        <div className="aspect-square bg-gray-100 relative">
-          {hasValidImage && currentImage ? (
-            <img
-              src={currentImage.url}
-              alt={plant.name || plant.identified_name}
-              className="w-full h-full object-cover"
-              onError={handleImageError}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
-              <div className="text-center">
-                <Leaf className="w-12 h-12 text-green-400 mx-auto mb-2" />
-                <p className="text-xs text-green-600 font-medium px-2">
-                  {plant.name || plant.identified_name}
-                </p>
-              </div>
-            </div>
-          )}
-          <div className={`absolute top-2 left-2 bg-${confidenceColor}-500 text-white px-2 py-1 rounded text-xs font-bold`}>
-            {(confidence * 100).toFixed(0)}%
-          </div>
-          
-          {images.length > 1 && (
-            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
-              {images.map((_, imgIndex) => (
-                <button
-                  key={imgIndex}
-                  onClick={() => setCurrentImageIndex(imgIndex)}
-                  className={`w-2 h-2 rounded-full ${
-                    imgIndex === currentImageIndex ? 'bg-white' : 'bg-white/50'
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="p-4">
-          <div className="mb-2">
-            <span className="text-sm text-gray-500">Name:</span>
-            <span className="text-orange-500 font-semibold ml-1">
-              {plant.name || plant.identified_name}
-            </span>
-          </div>
-          <div className="mb-2">
-            <span className="text-sm text-gray-500">Category:</span>
-            <span className={`bg-${confidenceColor}-100 text-${confidenceColor}-800 px-2 py-0.5 rounded text-xs font-medium ml-2`}>
-              {plant.category || activeTab}
-            </span>
-          </div>
-          <div>
-            <span className="text-sm text-gray-500">Match Confidence:</span>
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
-              <div 
-                className={`bg-${confidenceColor}-400 h-2 rounded-full transition-all duration-500`}
-                style={{ width: `${(confidence * 100)}%` }}
-              ></div>
-            </div>
-            <span className="text-xs text-gray-500">{(confidence * 100).toFixed(0)}%</span>
-          </div>
-          
-          {images.length > 0 && (
-            <div className="mt-2 text-xs text-gray-500">
-              {images.length} similar image{images.length !== 1 ? 's' : ''} available
-            </div>
-          )}
-        </div>
-      </div>
-    );
+    setPlantDetails(null);
   };
 
   const tabs = ['Plants', 'Crops', 'Insects'];
@@ -435,205 +560,203 @@ useEffect(() => {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-3">Species Identification</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            From garden beds to farm fields, quickly identify any plant, crop, or insect 
-            with AI-powered accuracy and practical care tips.
-          </p>
-        </div>
-
-        {/* Main Content Card */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          
-          {/* Tabs */}
-          <div className="border-b border-gray-200">
-            <div className="flex">
-              {tabs.map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
-                    activeTab === tab
-                      ? 'text-gray-800 border-b-2 border-gray-800 bg-white'
-                      : 'text-gray-500 hover:text-gray-700 bg-gray-50'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
+      <div className="px-6 py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-800 mb-3">Species Identification</h1>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              From garden beds to farm fields, quickly identify any plant, crop, or insect 
+              with AI-powered accuracy and practical care tips.
+            </p>
           </div>
 
-          {/* Upload Photo Section */}
-          <div className="p-8">
-            <h2 className="text-xl font-semibold text-gray-800 text-center mb-6">Upload Photo</h2>
-            
-            {/* Login Required Message */}
-            {!user && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
-                <div className="flex items-center space-x-3">
-                  <Info className="w-5 h-5 text-amber-600" />
-                  <p className="text-amber-700 text-sm">Please log in to identify plants and access your history.</p>
-                </div>
-              </div>
-            )}
-
-            {/* Unified Upload Component */}
-            <UnifiedUploadComponent 
-              onImageSelect={handleImageSelect}
-              onClear={clearImage}
-              imagePreview={imagePreview}
-            />
-
-            {/* Search Bar */}
-            <div className="mt-6">
-              <div className="flex items-center space-x-3 max-w-md mx-auto">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search by name"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
-                  />
-                </div>
-                <button
-                  onClick={handleIdentifyPlant}
-                  disabled={uploading || identifying || !user}
-                  className="px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
-                >
-                  {uploading || identifying ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>{uploading ? 'Uploading...' : 'Analyzing...'}</span>
-                    </>
-                  ) : (
-                    <span>Identify</span>
-                  )}
-                </button>
-                <button
-                  onClick={clearImage}
-                  className="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-medium hover:bg-gray-200 transition-colors"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="mt-6 bg-red-50 border border-red-200 rounded-xl p-4">
-            <div className="flex items-center space-x-3">
-              <AlertCircle className="w-5 h-5 text-red-600" />
-              <p className="text-red-700">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {/* Results Section */}
-        {result && (
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Best Matches</h2>
-            
-            {result.identified && result.identified_name ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Best Match */}
-                <PlantCard plant={result} isMainResult={true} />
-
-                {/* Alternative Suggestions */}
-                {result.alternative_suggestions && result.alternative_suggestions.map((suggestion, index) => (
-                  <PlantCard key={index} plant={suggestion} isMainResult={false} index={index} />
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+            <div className="border-b border-gray-200">
+              <div className="flex">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex-1 py-4 px-6 text-center font-medium transition-colors ${
+                      activeTab === tab
+                        ? 'text-gray-800 border-b-2 border-gray-800 bg-white'
+                        : 'text-gray-500 hover:text-gray-700 bg-gray-50'
+                    }`}
+                  >
+                    {tab}
+                  </button>
                 ))}
               </div>
-            ) : (
-              /* No Results */
-              <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <AlertCircle className="w-8 h-8 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-600 mb-2">
-                  Unable to Identify Species
-                </h3>
-                <p className="text-gray-500">
-                  The image might not contain a clear {activeTab.toLowerCase().slice(0, -1)}, or the species is not in our database.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
+            </div>
 
-        {/* Plant Detection Status */}
-        {result && (
-          <div className="mt-6">
-            <div className={`rounded-xl p-4 ${
-              result.is_plant_detected 
-                ? 'bg-green-50 border border-green-200' 
-                : 'bg-yellow-50 border border-yellow-200'
-            }`}>
+            <div className="p-8">
+              <h2 className="text-xl font-semibold text-gray-800 text-center mb-6">Upload Photo</h2>
+              
+              {!user && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+                  <div className="flex items-center space-x-3">
+                    <Info className="w-5 h-5 text-amber-600" />
+                    <p className="text-amber-700 text-sm">Please log in to identify plants and access your history.</p>
+                  </div>
+                </div>
+              )}
+
+              <UnifiedUploadComponent 
+                onImageSelect={handleImageSelect}
+                onClear={clearImage}
+                imagePreview={imagePreview}
+              />
+
+              <div className="mt-6">
+                <div className="flex items-center space-x-3 max-w-md mx-auto">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search by name"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                    />
+                  </div>
+                  <button
+                    onClick={handleIdentifyPlant}
+                    disabled={uploading || identifying || !user}
+                    className="px-6 py-3 bg-green-600 text-white rounded-xl font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                  >
+                    {uploading || identifying ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>{uploading ? 'Uploading...' : 'Analyzing...'}</span>
+                      </>
+                    ) : (
+                      <span>Identify</span>
+                    )}
+                  </button>
+                  <button
+                    onClick={clearImage}
+                    className="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {error && (
+            <div className="mt-6 bg-red-50 border border-red-200 rounded-xl p-4">
               <div className="flex items-center space-x-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  result.is_plant_detected ? 'bg-green-100' : 'bg-yellow-100'
-                }`}>
-                  <Leaf className={`w-5 h-5 ${
-                    result.is_plant_detected ? 'text-green-600' : 'text-yellow-600'
-                  }`} />
-                </div>
-                <div>
-                  <p className={`font-medium ${
-                    result.is_plant_detected ? 'text-green-800' : 'text-yellow-800'
-                  }`}>
-                    {result.is_plant_detected ? 'Plant Successfully Detected' : 'Plant Detection Uncertain'}
-                  </p>
-                  <p className={`text-sm ${
-                    result.is_plant_detected ? 'text-green-600' : 'text-yellow-600'
-                  }`}>
-                    Detection Confidence: {(result.is_plant_probability * 100).toFixed(1)}%
-                  </p>
-                </div>
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                <p className="text-red-700">{error}</p>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Tips Section */}
-        {!result && (
-          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-blue-800 mb-3">Tips for Better Results</h3>
-            <div className="grid md:grid-cols-2 gap-3 text-sm text-blue-700">
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-blue-600" />
-                <span>Take photos in good natural lighting</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-blue-600" />
-                <span>Include distinctive features clearly</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-blue-600" />
-                <span>Avoid blurry or distant shots</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-blue-600" />
-                <span>Fill the frame with the subject</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-blue-600" />
-                <span>Use camera for instant capture</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="w-4 h-4 text-blue-600" />
-                <span>Position plant in center of frame</span>
+          {result && (
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">Best Matches</h2>
+              
+              {result.identified && result.identified_name ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <PlantCard plant={result} isMainResult={true} activeTab={activeTab} />
+
+                  {result.alternative_suggestions && result.alternative_suggestions.map((suggestion, index) => (
+                    <PlantCard key={index} plant={suggestion} isMainResult={false} index={index} activeTab={activeTab} />
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-white rounded-xl shadow-md border border-gray-200 p-8 text-center">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <AlertCircle className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                    Unable to Identify Species
+                  </h3>
+                  <p className="text-gray-500">
+                    The image might not contain a clear {activeTab.toLowerCase().slice(0, -1)}, or the species is not in our database.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {result && (
+            <div className="mt-6">
+              <div className={`rounded-xl p-4 ${
+                result.is_plant_detected 
+                  ? 'bg-green-50 border border-green-200' 
+                  : 'bg-yellow-50 border border-yellow-200'
+              }`}>
+                <div className="flex items-center space-x-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    result.is_plant_detected ? 'bg-green-100' : 'bg-yellow-100'
+                  }`}>
+                    <Leaf className={`w-5 h-5 ${
+                      result.is_plant_detected ? 'text-green-600' : 'text-yellow-600'
+                    }`} />
+                  </div>
+                  <div>
+                    <p className={`font-medium ${
+                      result.is_plant_detected ? 'text-green-800' : 'text-yellow-800'
+                    }`}>
+                      {result.is_plant_detected ? 'Plant Successfully Detected' : 'Plant Detection Uncertain'}
+                    </p>
+                    <p className={`text-sm ${
+                      result.is_plant_detected ? 'text-green-600' : 'text-yellow-600'
+                    }`}>
+                      Detection Confidence: {(result.is_plant_probability * 100).toFixed(1)}%
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+
+            <ChatBot/>
+          {!result && (
+            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-blue-800 mb-3">Tips for Better Results</h3>
+              <div className="grid md:grid-cols-2 gap-3 text-sm text-blue-700">
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-blue-600" />
+                  <span>Take photos in good natural lighting</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-blue-600" />
+                  <span>Include distinctive features clearly</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-blue-600" />
+                  <span>Avoid blurry or distant shots</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-blue-600" />
+                  <span>Fill the frame with the subject</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-blue-600" />
+                  <span>Use camera for instant capture</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 text-blue-600" />
+                  <span>Position plant in center of frame</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
+
+      {result && result.identified && (
+        <div className="px-6 py-8 bg-gray-50">
+          <PlantDetailsCard 
+            details={plantDetails} 
+            loading={loadingDetails} 
+            plantName={result.identified_name}
+          />
+        </div>
+      )}
     </div>
   );
 };

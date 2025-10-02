@@ -201,7 +201,7 @@ const ServiceSection = ({ service }) => {
           <div className="flex flex-col items-start w-full">
             {/* Title with each word on a new line */}
             <h2
-              className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tight"
+              className="text-6xl sm:text-6xl md:text-8xl lg:text-9xl font-extrabold tracking-tight"
               style={{
                 lineHeight: "1.1",
                 display: "flex",
@@ -225,7 +225,7 @@ const ServiceSection = ({ service }) => {
           >
             {service.content.map((item, index) => (
               <li key={index} className="flex items-start space-x-2 sm:space-x-3">
-                <span className="leading-relaxed text-left">{item}</span>
+                <span className="leading-relaxed text-left opacity-60">{item}</span>
               </li>
             ))}
           </ul>

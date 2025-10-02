@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { X, Send, Leaf } from "lucide-react";
+import { X, Send } from "lucide-react";
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +12,7 @@ const ChatBot = () => {
     },
   ]);
   const [inputValue, setInputValue] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -21,7 +22,7 @@ const ChatBot = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isTyping]);
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -29,7 +30,7 @@ const ChatBot = () => {
     }
   }, [isOpen]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
     const userMessage = {
@@ -40,17 +41,78 @@ const ChatBot = () => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const currentInput = inputValue;
     setInputValue("");
+    setIsTyping(true);
 
-    setTimeout(() => {
+    try {
+      // Get last 2 messages (1 user + 1 bot) for context
+      const recentMessages = messages.slice(-2);
+      const conversationHistory = recentMessages.map(msg => ({
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.text
+      }));
+
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          prompt: currentInput,
+          conversationHistory: conversationHistory, // Send context
+          systemPrompt: `You are Leafy, a friendly garden assistant for AgroCare. 
+
+IMPORTANT RULES:
+1. ONLY answer questions about plants, gardening, crops, farming, agriculture, and plant care
+2. If the question is NOT about plants/farming, politely say: "Sorry, I can only help with plant and farming questions."
+3. Use simple, easy English words that anyone can understand
+4. Give answers in clear steps (Step 1, Step 2, etc.) when explaining how to do something
+5. Keep answers short and helpful (2-4 sentences or simple steps)
+6. Be friendly and encouraging
+
+Examples of what to answer:
+✓ Plant diseases and treatment
+✓ How to grow vegetables
+✓ Watering schedules
+✓ Fertilizer advice
+✓ Pest control
+✓ Soil problems
+✓ Crop recommendations
+
+Examples of what NOT to answer:
+✗ Math homework
+✗ Cooking recipes (unless about growing ingredients)
+✗ General knowledge questions
+✗ Programming or technology
+✗ Any non-farming topics`,
+          maxTokens: 200,
+          temperature: 0.7
+        }),
+      });
+
+      const data = await response.json();
+      setIsTyping(false);
+
       const botMessage = {
-        id: messages.length + 2,
-        text: "Thank you for your question! This is a demo response. Once you integrate the API, I'll provide helpful gardening advice.",
+        id: Date.now(),
+        text: data.reply || "Sorry, I couldn't understand.",
         sender: "bot",
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, botMessage]);
-    }, 1000);
+    } catch (err) {
+      console.error("Chat error:", err);
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          text: "⚠️ Error: Could not connect to server.",
+          sender: "bot",
+          timestamp: new Date(),
+        },
+      ]);
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -68,7 +130,7 @@ const ChatBot = () => {
         className={`fixed bottom-6 right-6 z-50 p-4 rounded-full transition-all duration-300 ${
           isOpen
             ? "bg-red-500 hover:bg-red-600 scale-90"
-            : "bg-trasparent hover:scale-110"
+            : "bg-transparent hover:scale-110"
         }`}
         aria-label={isOpen ? "Close chat" : "Open chat"}
       >
@@ -81,7 +143,6 @@ const ChatBot = () => {
               alt="Leafy Assistant"
               className="w-12 h-12 object-cover border-2 border-white rounded-full"
             />
-            {/* REMOVED: <span className="absolute inset-0 rounded-full bg-[#1c352d] animate-ping opacity-75"></span> */}
           </div>
         )}
       </button>
@@ -110,7 +171,7 @@ const ChatBot = () => {
             <div>
               <h3 className="text-white font-semibold text-sm">Agrocare</h3>
               <p className="text-green-200 text-xs">
-                Leafy - Your personal assistent
+                Leafy - Your personal assistant
               </p>
             </div>
           </div>
@@ -124,7 +185,7 @@ const ChatBot = () => {
         </div>
 
         {/* Messages Area */}
-        <div className="h-[400px] overflow-y-auto p-4 bg-gray-50">
+        <div className="h-[400px] overflow-y-auto p-4 bg-gray-50 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {messages.map((message) => (
             <div
               key={message.id}
@@ -151,7 +212,9 @@ const ChatBot = () => {
                     : "bg-[#1c352d] text-white rounded-tl-sm shadow-md"
                 }`}
               >
-                <p className="text-sm leading-relaxed">{message.text}</p>
+                <p className="text-sm leading-relaxed whitespace-pre-line">
+                  {message.text}
+                </p>
               </div>
 
               {message.sender === "user" && (
@@ -163,6 +226,38 @@ const ChatBot = () => {
               )}
             </div>
           ))}
+
+          {/* Typing Indicator */}
+          {isTyping && (
+            <div className="flex mb-4 justify-start">
+              <div className="flex-shrink-0 mr-2">
+                <div className="w-8 h-8 rounded-full overflow-hidden">
+                  <img
+                    src="/leafy.jpg"
+                    alt="Leafy Assistant"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+              <div className="bg-[#1c352d] rounded-2xl rounded-tl-sm shadow-md px-5 py-3.5 flex items-center">
+                <div className="flex gap-1.5">
+                  <div 
+                    className="w-2 h-2 bg-green-300 rounded-full animate-bounce"
+                    style={{ animationDelay: '0ms', animationDuration: '1s' }}
+                  ></div>
+                  <div 
+                    className="w-2 h-2 bg-green-300 rounded-full animate-bounce"
+                    style={{ animationDelay: '200ms', animationDuration: '1s' }}
+                  ></div>
+                  <div 
+                    className="w-2 h-2 bg-green-300 rounded-full animate-bounce"
+                    style={{ animationDelay: '400ms', animationDuration: '1s' }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div ref={messagesEndRef} />
         </div>
 
