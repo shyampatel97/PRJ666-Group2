@@ -1,7 +1,7 @@
 // index.js (Your Main Page File)
 
 import React, { useEffect, useRef } from "react";
-import { gsap } from "gsap"; // Keep gsap for the parallax effect
+// import { gsap } from "gsap"; // Keep gsap for the parallax effect
 import {
   Leaf,
   ArrowRight,
@@ -14,6 +14,7 @@ import Navbar from "@/components/Navbar";
 import Carousel from "@/components/Carousel";
 // 1. Import the new component
 import ScrollServices from "@/components/ScrollServices"; // Adjust path as needed
+import ChatBot from "@/components/Chatbot";
 
 // Define service data with Icon component references
 const servicesData = [
@@ -24,8 +25,9 @@ const servicesData = [
     bgColor: "#f0ead2",
     textColor: "#283618",
     image: "/plant-identify.JPG",
+    buttonText: "Identify Now",
     content: [
-      "Instantly identify any plant with a photo using our AI-powered recognition engine. Get comprehensive details, care tips, and potential issues for thousands of species. Expand your botanical knowledge and ensure every plant thrives.",
+      "Instantly identify over 10,000 plant species with 98% accuracy using advanced computer vision technology trained on millions of botanical images. Simply snap a photo and get detailed information on care, growth habits, and ideal conditions. Perfect for gardeners, farmers, and plant enthusiasts of all levels.",
     ],
   },
   {
@@ -35,30 +37,33 @@ const servicesData = [
     bgColor: "#283618",
     textColor: "#f0ead2",
     image: "/disease-diagnoses.JPG",
+    buttonText: "Diagnose Now",
     content: [
-      "Detect diseases early by analyzing photo submissions of affected plants. Receive an accurate diagnosis and recommended organic treatment plans. Minimize crop loss and act fast with science-backed solutions.",
+      "Quickly detect and diagnose plant diseases with AI-powered image analysis trained on thousands of crop health cases. Upload a photo of affected leaves or stems to receive accurate results with tailored treatment recommendations. Prevent yield loss, reduce chemical dependency, and safeguard your crops with reliable, science-driven guidance.",
     ],
   },
   {
     id: "dashboard",
     title: "Smart Dashboard",
     icon: Monitor, // Include the component reference
-    bgColor: "#dda15e",
+    bgColor: "#f0ead2",
     textColor: "#283618",
     image: "/dashboard.JPG",
+    buttonText: "Try Dashboard",
     content: [
-      "Track plant health daily with real-time updates and personalized AI insights. Monitor environmental conditions, track your activity, and manage your tasks. Optimize your farming practices for peak efficiency and better yields."
+       "Track plant health daily with real-time updates and AI-powered insights. Monitor environmental conditions like soil, light, and weather while keeping a log of your activities and tasks. Gain personalized recommendations to optimize farming practices, improve efficiency, and maximize yields with data-driven decision making."
     ],
   },
   {
     id: "marketplace",
     title: "Curated Marketplace",
     icon: ShoppingCart, // Include the component reference
-    bgColor: "#bc6c25",
-    textColor: "#fefae0",
+    bgColor: "#283618",
+    textColor: "#f0ead2",
     image: "/marketplace.JPG",
+    buttonText: "Search Products",
     content: [
-      "Find trusted tools, organic seeds, and sustainable fertilizers in one place. Products are curated by experts and tested by farmers for quality and reliability. Support ethical farming and make responsible purchases easily."
+      "Discover a curated selection of farming essentials including organic seeds, eco-friendly fertilizers, and reliable tools—all vetted by agricultural experts. Every product is tested and trusted by farmers to ensure quality and sustainability. Support ethical practices while making smart, responsible purchases that empower your farm’s growth."
     ],
   },
 ];
@@ -474,7 +479,7 @@ const HomePage = () => {
           </button>
         </div>
       </section>
-
+                  <ChatBot />
       {/* Plant Gallery Carousel */}
       <section style={{ backgroundColor: "#283618" }}>
         <Carousel />
