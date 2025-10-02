@@ -125,6 +125,23 @@ const HomePage = () => {
     };
   }, []);
 
+
+useEffect(() => {
+  // Force scroll to top on page load
+  if (typeof window !== 'undefined') {
+    window.history.scrollRestoration = 'manual';
+    
+    // Immediate scroll
+    window.scrollTo(0, 0);
+    
+    // Also scroll after a brief delay to ensure everything is loaded
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    }, 0);
+  }
+}, []);
+
+
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "#283618" }}>
       <Navbar />
