@@ -21,6 +21,7 @@
     "dotenv": "^17.2.1",
     "formidable": "^3.5.4",
     "google-auth-library": "^10.3.0",
+    "gsap": "^3.13.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.541.0",
     "mongodb": "^6.19.0",

@@ -1,21 +1,73 @@
-import React, { useEffect, useState } from "react";
+// index.js (Your Main Page File)
+
+import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap"; // Keep gsap for the parallax effect
 import {
   Leaf,
-  Bug,
-  BarChart3,
-  Store,
   ArrowRight,
-  LeafIcon,
+  Search,
+  Stethoscope,
+  Monitor,
+  ShoppingCart,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Carousel from "@/components/Carousel";
+// 1. Import the new component
+import ScrollServices from "@/components/ScrollServices"; // Adjust path as needed
 
+// Define service data with Icon component references
+const servicesData = [
+  {
+    id: "plant-identification",
+    title: "Plant Identification",
+    icon: Search, // Include the component reference
+    bgColor: "#f0ead2",
+    textColor: "#283618",
+    image: "/plant-identify.JPG",
+    content: [
+      "Instantly identify any plant with a photo using our AI-powered recognition engine. Get comprehensive details, care tips, and potential issues for thousands of species. Expand your botanical knowledge and ensure every plant thrives.",
+    ],
+  },
+  {
+    id: "disease-diagnosis",
+    title: "Disease Diagnosis",
+    icon: Stethoscope, // Include the component reference
+    bgColor: "#283618",
+    textColor: "#f0ead2",
+    image: "/disease-diagnoses.JPG",
+    content: [
+      "Detect diseases early by analyzing photo submissions of affected plants. Receive an accurate diagnosis and recommended organic treatment plans. Minimize crop loss and act fast with science-backed solutions.",
+    ],
+  },
+  {
+    id: "dashboard",
+    title: "Smart Dashboard",
+    icon: Monitor, // Include the component reference
+    bgColor: "#dda15e",
+    textColor: "#283618",
+    image: "/dashboard.JPG",
+    content: [
+      "Track plant health daily with real-time updates and personalized AI insights. Monitor environmental conditions, track your activity, and manage your tasks. Optimize your farming practices for peak efficiency and better yields."
+    ],
+  },
+  {
+    id: "marketplace",
+    title: "Curated Marketplace",
+    icon: ShoppingCart, // Include the component reference
+    bgColor: "#bc6c25",
+    textColor: "#fefae0",
+    image: "/marketplace.JPG",
+    content: [
+      "Find trusted tools, organic seeds, and sustainable fertilizers in one place. Products are curated by experts and tested by farmers for quality and reliability. Support ethical farming and make responsible purchases easily."
+    ],
+  },
+];
 
 const HomePage = () => {
-  const [isHovered, setIsHovered] = useState(false);
-
+  // Parallax animation logic remains here
   useEffect(() => {
-    // Reverse scroll animation for photo columns
+    if (typeof window === "undefined") return;
+
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const reverseColumns = document.querySelectorAll(".photo-column-reverse");
@@ -44,7 +96,10 @@ const HomePage = () => {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#283618" }}>
       <Navbar />
+
+      {/* Existing CSS styles for mission/parallax section */}
       <style jsx>{`
+        /* --- Animation Keyframes (Parallax/Mission) --- */
         @keyframes fadeInUp {
           from {
             opacity: 0;
@@ -75,29 +130,6 @@ const HomePage = () => {
             transform: translateX(0);
           }
         }
-        @keyframes leafBounce {
-          0%,
-          100% {
-            transform: translateY(0) rotate(0deg);
-          }
-          25% {
-            transform: translateY(-5px) rotate(-5deg);
-          }
-          75% {
-            transform: translateY(-3px) rotate(5deg);
-          }
-        }
-        @keyframes textGlow {
-          0%,
-          100% {
-            text-shadow: 0 0 5px rgba(34, 197, 94, 0.3);
-          }
-          50% {
-            text-shadow: 0 0 20px rgba(34, 197, 94, 0.6),
-              0 0 30px rgba(34, 197, 94, 0.4);
-          }
-        }
-        /* Animations from provided CSS */
         @keyframes pop {
           0% {
             opacity: 0;
@@ -128,6 +160,8 @@ const HomePage = () => {
             transform: translateY(0);
           }
         }
+
+        /* --- Animation Utility Classes --- */
         .animate {
           animation-duration: 0.7s;
           animation-timing-function: cubic-bezier(0.26, 0.53, 0.74, 1.48);
@@ -160,6 +194,8 @@ const HomePage = () => {
         .delay-8 {
           animation-delay: 2.4s;
         }
+
+        /* --- Mission Section Specific Animations --- */
         .mission-title {
           opacity: 0;
           animation: fadeInUp 1s ease-out 0.2s forwards;
@@ -180,6 +216,8 @@ const HomePage = () => {
           opacity: 0;
           animation: fadeInUp 0.8s ease-out 1.8s forwards;
         }
+
+        /* --- Photo Columns Parallax Styles --- */
         .photo-columns {
           overflow: hidden;
           height: 600px;
@@ -211,129 +249,6 @@ const HomePage = () => {
           object-fit: cover;
           display: block;
         }
-        /* Updated Plant ID Card Styles - Adjusted for palette */
-        .plant-id-wrap {
-          display: flex;
-          flex-wrap: nowrap;
-          justify-content: space-between;
-          width: 100%;
-          max-width: 800px;
-          height: 350px;
-          margin: 0 auto;
-          border: 1px solid #283618; /* Dark Olive Green Border */
-          border-radius: 20px;
-          transition: 0.3s ease-in-out;
-          position: relative;
-          overflow: hidden;
-        }
-        #plant-identification-card,
-        #disease-diagnosis-card,
-        #dashboard-card,
-        #marketplace-card {
-          box-shadow: 8px 8px 12px rgba(0, 0, 0, 0.3);
-        }
-        .plant-id-overlay {
-          position: relative;
-          display: flex;
-          width: 100%;
-          height: 100%;
-          padding: 1rem 0.75rem;
-          background: #283618; /* Dark Olive Green Overlay */
-          transition: 0.4s ease-in-out;
-          z-index: 1;
-        }
-        .plant-id-overlay-content {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          width: 100%;
-          height: 500%;
-          padding: 0.5rem 0 0 0.5rem;
-          border-image: linear-gradient(
-              to bottom,
-              #b38a58 5%, /* Tan/Brown Accent */
-              #283618 35% 65%, /* Dark Olive Green */
-              #b38a58 95% /* Tan/Brown Accent */
-            )
-            0 0 0 100%;
-          transition: 0.3s ease-in-out 0.2s;
-          z-index: 1;
-        }
-        .plant-id-image-content {
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: 100%;
-          height: 100%;
-          background-size: cover;
-          transition: 0.3s ease-in-out;
-        }
-        .plant-id-dots {
-          position: absolute;
-          bottom: 50%;
-          right: 1rem;
-          transform: translateY(50%);
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          width: 20px;
-          height: 60px;
-          transition: 0.3s ease-in-out 0.3s;
-        }
-        .plant-id-dot {
-          width: 10px;
-          height: 10px;
-          background: #b38a58; /* Tan/Brown Dot */
-          border: 1px solid #283618; /* Dark Olive Green Border */
-          border-radius: 50%;
-          margin: 5px 0;
-          transition: 0.3s ease-in-out 0.3s;
-        }
-        .plant-id-text {
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: calc(100% - 2rem);
-          height: calc(100% - 2rem);
-          margin: 1rem;
-          padding: 1.5rem;
-          background: #f0ead2; /* Light Beige/Cream Text Background */
-          font-size: max(10pt, 2vmin);
-          line-height: 1.5;
-          color: #283618; /* Dark Olive Green Text Color */
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          border-radius: 20px;
-        }
-        .plant-id-inset {
-          max-width: 50%;
-          margin: 0.25em 1em 1em 0;
-          border-radius: 0.25em;
-          float: left;
-        }
-        .plant-id-tree {
-          place-self: center;
-          width: calc(50px + 2vw);
-        }
-        .plant-id-wrap:hover .plant-id-overlay {
-          transform: translateX(-500px);
-        }
-        .plant-id-wrap:hover .plant-id-image-content {
-          width: 300px;
-        }
-        .plant-id-wrap:hover .plant-id-overlay-content {
-          border: none;
-          transition-delay: 0.2s;
-          transform: translateX(500px);
-        }
-        .plant-id-wrap:hover .plant-id-dots {
-          transform: translateY(50%) translateX(1rem);
-        }
-        .plant-id-wrap:hover .plant-id-dot {
-          background: #283618; /* Dark Olive Green Dot on hover */
-        }
       `}</style>
 
       {/* Hero Section */}
@@ -342,7 +257,6 @@ const HomePage = () => {
         style={{ backgroundImage: "url(/hero-part1.png)" }}
       >
         <div className="absolute inset-0 bg-black bg-opacity-0"></div>
-
         <div className="relative max-w-7xl mx-auto px-6 py-20 lg:py-32 h-full flex items-center">
           <div className="max-w-2xl">
             <h1
@@ -357,7 +271,6 @@ const HomePage = () => {
               Empowering farmers with AI-driven tools for crop management and
               disease identification
             </p>
-
             <button className="group bg-white text-green-800 px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
               Get Started
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -366,12 +279,14 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section className="py-20 bg-283618">
+      {/* Mission Section and Parallax Photos */}
+      <section className="py-20" style={{ backgroundColor: "#283618" }}>
+        {/* ... (Mission and Photo Column markup remains the same) ... */}
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             {/* Left Content */}
             <div className="space-y-8">
+              {/* Title and paragraph content */}
               <div>
                 <h2
                   className="mission-title text-left mb-6"
@@ -392,7 +307,6 @@ const HomePage = () => {
                   Agrocare helps you read it and act in time.
                 </h2>
               </div>
-
               <div className="space-y-2 text-lg text-gray-700 leading-relaxed">
                 <p
                   className="mission-p1 transition-colors duration-300 cursor-default text-left"
@@ -417,7 +331,6 @@ const HomePage = () => {
                   losses, and promote sustainable farming practices for the
                   future.
                 </p>
-
                 <div className="flex items-center gap-2 text-green-600 font-semibold pt-4 mission-tagline justify-start">
                   <Leaf className="w-6 h-6 hover:rotate-12 hover:scale-110 transition-transform duration-300 ease-in-out" />
                   <span className="text-xl hover:scale-105 transition-transform duration-200 ease-in-out cursor-default">
@@ -535,203 +448,9 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Services Section (Grid Layout) - REDESIGNED */}
-      <section className="py-20" style={{ backgroundColor: "#fffef7ff" }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <h1
-            className="text-4xl lg:text-5xl font-bold text-center mb-16"
-            style={{ color: "#283618" }} /* Dark Olive Green Text */
-          >
-            Our Services
-          </h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-            {/* Plant Identification */}
-            <div
-              id="plant-identification-card"
-              className="plant-id-wrap animate pop"
-            >
-              <div
-                id="plant-identification-overlay"
-                className="plant-id-overlay"
-              >
-                <div
-                  id="plant-identification-content"
-                  className="plant-id-overlay-content animate slide-left delay-2"
-                >
-                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-black text-center">
-                    {/* Changed text color to white for contrast on dark green */}
-                    Plant Identification
-                  </h3>
-                  <p
-                    className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
-                    style={{ marginBottom: "1.5rem" }}
-                  ></p>
-                </div>
-                <div className="plant-id-image-content animate slide delay-5">
-                  <img
-                    src="/plant-identify.JPG"
-                    alt="Plant Identification"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </div>
-              </div>
-              <div
-                id="plant-identification-text"
-                className="plant-id-text text-justify"
-              >
-                <p className="text-xs md:text-sm leading-relaxed mb-2">
-                  <br />
-                  <br />
-                  Detect diseases before they spread. With just a photo, our AI
-                  can identify common crop diseases and alert you to early signs
-                  of trouble.
-                </p>
-                <p className="text-xs md:text-sm leading-relaxed mb-2">
-                  Prevent loss, protect your harvest, and act fast with
-                  science-backed solutions. Our platform empowers farmers with
-                  precise plant identification.
-                </p>
-              </div>
-            </div>
-
-            {/* Disease Diagnosis */}
-            <div
-              id="disease-diagnosis-card"
-              className="plant-id-wrap animate pop"
-            >
-              <div id="disease-diagnosis-overlay" className="plant-id-overlay">
-                <div
-                  id="disease-diagnosis-content"
-                  className="plant-id-overlay-content animate slide-left delay-2"
-                >
-                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-black text-center">
-                    {/* Changed text color to white for contrast on dark green */}
-                    Disease Diagnosis
-                  </h3>
-                  <p
-                    className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
-                    style={{ marginBottom: "1.5rem" }}
-                  ></p>
-                </div>
-                <div className="plant-id-image-content animate slide delay-5">
-                  <img
-                    src="/disease-diagnoses.JPG"
-                    alt="Disease Diagnoses"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </div>
-              </div>
-              <div
-                id="disease-diagnosis-text"
-                className="plant-id-text text-justify"
-              >
-                <p className="text-xs md:text-sm leading-relaxed mb-2">
-                  Detect diseases before they spread. Our AI analyzes photos to
-                  identify crop diseases and provides early warnings.
-                </p>
-                <p className="text-xs md:text-sm leading-relaxed mb-2">
-                  Take action quickly with expert recommendations to protect
-                  your harvest and reduce losses.
-                </p>
-              </div>
-            </div>
-
-            {/* Dashboard */}
-            <div id="dashboard-card" className="plant-id-wrap animate pop">
-              <div id="dashboard-overlay" className="plant-id-overlay">
-                <div
-                  id="dashboard-content"
-                  className="plant-id-overlay-content animate slide-left delay-2"
-                >
-                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-black text-center">
-                    {/* Changed text color to white for contrast on dark green */}
-                    Dashboard
-                  </h3>
-                  <p
-                    className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
-                    style={{ marginBottom: "1.5rem" }}
-                  ></p>
-                </div>
-                <div className="plant-id-image-content animate slide delay-5">
-                  <img
-                    src="/dashboard.JPG"
-                    alt="Disease Diagnoses"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </div>
-              </div>
-              <div id="dashboard-text" className="plant-id-text text-justify">
-                <p className="text-xs md:text-sm leading-relaxed mb-2">
-                  Track plant health daily with real-time updates and AI
-                  insights.
-                </p>
-                <p className="text-xs md:text-sm leading-relaxed mb-2">
-                  Receive weather forecasts and care suggestions to optimize
-                  your farming practices.
-                </p>
-                <p className="text-xs md:text-sm leading-relaxed">
-                  Stay informed with alerts to keep your plants thriving
-                  sustainably.
-                </p>
-              </div>
-            </div>
-
-            {/* Marketplace */}
-            <div id="marketplace-card" className="plant-id-wrap animate pop">
-              <div id="marketplace-overlay" className="plant-id-overlay">
-                <div
-                  id="marketplace-content"
-                  className="plant-id-overlay-content animate slide-left delay-2"
-                >
-                  <h3 className="animate slide-left pop delay-4 text-xl font-bold text-black text-center">
-                    {/* Changed text color to white for contrast on dark green */}
-                    Marketplace
-                  </h3>
-                  <p
-                    className="animate slide-left pop delay-5 text-xs md:text-sm text-white text-center"
-                    style={{ marginBottom: "1.5rem" }}
-                  ></p>
-                </div>
-                <div className="plant-id-image-content animate slide delay-5">
-                  <img
-                    src="/marketplace.JPG"
-                    alt="Disease Diagnoses"
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
-                  />
-                </div>
-              </div>
-              <div id="marketplace-text" className="plant-id-text text-justify">
-                <p className="text-xs md:text-sm leading-relaxed mb-2">
-                  Discover trusted tools, seeds, and fertilizers in one place.
-                </p>
-                <p className="text-xs md:text-sm leading-relaxed mb-2">
-                  Curated by experts and tested by farmers for quality and
-                  affordability.
-                </p>
-                <p className="text-xs md:text-sm leading-relaxed">
-                  Support sustainable farming with community-driven products.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* --- SCROLL-SNAPPING SERVICES SECTION (Component) --- */}
+      <ScrollServices servicesData={servicesData} />
+      {/* --- END SCROLL-SNAPPING SERVICES SECTION --- */}
 
       {/* CTA Section */}
       <section
