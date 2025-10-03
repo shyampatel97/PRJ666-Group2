@@ -1,6 +1,6 @@
-// index.js (Your Main Page File)
+// pages/index.js
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import {
   Leaf,
   ArrowRight,
@@ -9,11 +9,11 @@ import {
   Monitor,
   ShoppingCart,
 } from "lucide-react";
-import Navbar from "@/components/Navbar";
-import Carousel from "@/components/Carousel";
-import ScrollServices from "@/components/ScrollServices";
-import ChatBot from "@/components/Chatbot";
-import StatsSection from "@/components/StatsSection";
+import Navbar from "../components/Navbar";
+import Carousel from "../components/Carousel";
+import ScrollServices from "../components/ScrollServices";
+import ChatBot from "../components/Chatbot";
+import StatsSection from "../components/StatsSection";
 
 // Custom styles for hiding scrollbar
 const customStyles = `
@@ -93,7 +93,9 @@ const HomePage = () => {
     document.head.appendChild(styleElement);
     
     return () => {
-      document.head.removeChild(styleElement);
+      if (document.head.contains(styleElement)) {
+        document.head.removeChild(styleElement);
+      }
     };
   }, []);
 
@@ -126,28 +128,26 @@ const HomePage = () => {
     };
   }, []);
 
-
-useEffect(() => {
-  // Force scroll to top on page load
-  if (typeof window !== 'undefined') {
-    window.history.scrollRestoration = 'manual';
-    
-    // Immediate scroll
-    window.scrollTo(0, 0);
-    
-    // Also scroll after a brief delay to ensure everything is loaded
-    setTimeout(() => {
+  useEffect(() => {
+    // Force scroll to top on page load
+    if (typeof window !== 'undefined') {
+      window.history.scrollRestoration = 'manual';
+      
+      // Immediate scroll
       window.scrollTo(0, 0);
-    }, 0);
-  }
-}, []);
-
+      
+      // Also scroll after a brief delay to ensure everything is loaded
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 0);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "#283618" }}>
       <Navbar />
 
-      <style jsx>{`
+      <style jsx global>{`
         /* --- Animation Keyframes --- */
         @keyframes fadeInUp {
           from {
