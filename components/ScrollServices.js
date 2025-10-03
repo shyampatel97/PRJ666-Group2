@@ -185,7 +185,7 @@ const ServiceSection = ({ service }) => {
       }}
     >
       <div
-        className={`w-full h-full flex items-center ${paddingTop} p-4 sm:p-6 lg:p-8 rounded-3xl sm:rounded-[40px] lg:rounded-[50px] shadow-2xl`}
+        className={`w-full h-full flex items-center ${paddingTop} p-4 sm:p-6 lg:p-8 rounded-3xl sm:rounded-[40px] lg:rounded-[50px]`}
         style={{ 
           backgroundColor: service.bgColor,
           color: service.textColor,
