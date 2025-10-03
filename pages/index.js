@@ -13,6 +13,7 @@ import Navbar from "@/components/Navbar";
 import Carousel from "@/components/Carousel";
 import ScrollServices from "@/components/ScrollServices";
 import ChatBot from "@/components/Chatbot";
+import StatsSection from "@/components/StatsSection";
 
 // Custom styles for hiding scrollbar
 const customStyles = `
@@ -471,6 +472,9 @@ useEffect(() => {
 
       {/* Scroll-Snapping Services Section */}
       <ScrollServices servicesData={servicesData} />
+
+      {/* Stats Section - NEW */}
+      <StatsSection />
 
       {/* CTA Section */}
       <section
