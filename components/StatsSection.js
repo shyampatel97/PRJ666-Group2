@@ -1,10 +1,6 @@
 // components/StatsSection.js
 
 import React, { useEffect, useRef } from "react";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const StatsSection = () => {
   const sectionRef = useRef(null);
@@ -17,30 +13,42 @@ const StatsSection = () => {
   ];
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      statsRef.current.forEach((el, i) => {
-        if (!el) return;
+    // Dynamically import GSAP only on client-side
+    const loadGsap = async () => {
+      if (typeof window === "undefined") return;
 
-        const obj = { val: 0 };
-        gsap.to(obj, {
-          val: stats[i].value,
-          duration: 2,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 75%",
-          },
-          onUpdate: () => {
-            el.textContent = i === 2
-              ? Math.floor(obj.val / 1000) + "K+"
-              : Math.floor(obj.val) + stats[i].suffix;
-          },
+      const { gsap } = await import("gsap");
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      
+      gsap.registerPlugin(ScrollTrigger);
+
+      const ctx = gsap.context(() => {
+        statsRef.current.forEach((el, i) => {
+          if (!el) return;
+
+          const obj = { val: 0 };
+          gsap.to(obj, {
+            val: stats[i].value,
+            duration: 2,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top 75%",
+            },
+            onUpdate: () => {
+              el.textContent = i === 2
+                ? Math.floor(obj.val / 1000) + "K+"
+                : Math.floor(obj.val) + stats[i].suffix;
+            },
+          });
         });
-      });
-    }, sectionRef);
+      }, sectionRef);
 
-    return () => ctx.revert();
-  }, []);
+      return () => ctx.revert();
+    };
+
+    loadGsap();
+  }, [stats]);
 
   return (
     <section
