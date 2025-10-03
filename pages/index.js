@@ -1,6 +1,6 @@
-// pages/index.js
+// index.js (Your Main Page File)
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Leaf,
   ArrowRight,
@@ -9,11 +9,11 @@ import {
   Monitor,
   ShoppingCart,
 } from "lucide-react";
-import Navbar from "../components/Navbar";
-import Carousel from "../components/Carousel";
-import ScrollServices from "../components/ScrollServices";
-import ChatBot from "../components/Chatbot";
-import StatsSection from "../components/StatsSection";
+import Navbar from "@/components/Navbar";
+import Carousel from "@/components/Carousel";
+import ScrollServices from "@/components/ScrollServices";
+import ChatBot from "@/components/Chatbot";
+import StatsSection from "@/components/StatsSection";
 
 // Custom styles for hiding scrollbar
 const customStyles = `
@@ -93,9 +93,7 @@ const HomePage = () => {
     document.head.appendChild(styleElement);
     
     return () => {
-      if (document.head.contains(styleElement)) {
-        document.head.removeChild(styleElement);
-      }
+      document.head.removeChild(styleElement);
     };
   }, []);
 
@@ -128,26 +126,28 @@ const HomePage = () => {
     };
   }, []);
 
-  useEffect(() => {
-    // Force scroll to top on page load
-    if (typeof window !== 'undefined') {
-      window.history.scrollRestoration = 'manual';
-      
-      // Immediate scroll
+
+useEffect(() => {
+  // Force scroll to top on page load
+  if (typeof window !== 'undefined') {
+    window.history.scrollRestoration = 'manual';
+    
+    // Immediate scroll
+    window.scrollTo(0, 0);
+    
+    // Also scroll after a brief delay to ensure everything is loaded
+    setTimeout(() => {
       window.scrollTo(0, 0);
-      
-      // Also scroll after a brief delay to ensure everything is loaded
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-      }, 0);
-    }
-  }, []);
+    }, 0);
+  }
+}, []);
+
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "#283618" }}>
       <Navbar />
 
-      <style jsx global>{`
+      <style jsx>{`
         /* --- Animation Keyframes --- */
         @keyframes fadeInUp {
           from {
@@ -473,8 +473,7 @@ const HomePage = () => {
       {/* Scroll-Snapping Services Section */}
       <ScrollServices servicesData={servicesData} />
 
-      {/* Stats Section - NEW */}
-      <StatsSection />
+      <StatsSection servicesData={servicesData} />
 
       {/* CTA Section */}
       <section
