@@ -121,7 +121,6 @@
 //   );
 // };
 
-// export default ScrollServices;
 
 
 import React from "react";
@@ -181,11 +180,11 @@ const ServiceSection = ({ service }) => {
       className={`relative w-full snap-start transition-colors duration-500`}
       style={{
         height: "100vh",
-        padding: "12px 0",
+        padding: "12px 16px",
       }}
     >
       <div
-        className={`w-full h-full flex items-center ${paddingTop} p-4 sm:p-6 lg:p-8 rounded-3xl sm:rounded-[40px] lg:rounded-[50px]`}
+        className={`w-full h-full flex items-center ${paddingTop} p-4 sm:p-6 md:p-8 lg:p-10 rounded-2xl sm:rounded-3xl md:rounded-[40px] lg:rounded-[50px]`}
         style={{ 
           backgroundColor: service.bgColor,
           color: service.textColor,
@@ -194,14 +193,16 @@ const ServiceSection = ({ service }) => {
           fontWeight: 500,
           fontStyle: "normal",
           fontVariationSettings: '"wdth" 100',
+          alignItems: "flex-start",
+          paddingTop: "6rem",
         }}
       >
         {/* Left Content (Text and Features) - Left-aligned with proper spacing */}
-        <div className="flex flex-col items-start text-left space-y-4 sm:space-y-6 md:space-y-8 max-w-4xl w-full pl-8 sm:pl-12 md:pl-16 lg:pl-20 xl:pl-24 pr-8">
+        <div className="flex flex-col items-start text-left space-y-3 sm:space-y-4 md:space-y-6 lg:space-y-8 w-full pl-3 sm:pl-6 md:pl-8 lg:pl-10 xl:pl-12 pr-3 sm:pr-4 md:pr-6">
           <div className="flex flex-col items-start w-full">
             {/* Title with each word on a new line */}
             <h2
-              className="text-6xl sm:text-6xl md:text-8xl lg:text-9xl font-extrabold tracking-tight"
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight"
               style={{
                 lineHeight: "1.1",
                 display: "flex",
@@ -212,11 +213,20 @@ const ServiceSection = ({ service }) => {
                 <span key={index}>{word}</span>
               ))}
             </h2>
+            {/* Horizontal line below title */}
+            <div 
+              className="w-full mt-4 sm:mt-6"
+              style={{
+                height: "2px",
+                backgroundColor: service.textColor,
+                opacity: 0.3,
+              }}
+            />
           </div>
 
           {/* Content List - Animated on scroll */}
           <ul 
-            className="space-y-2 sm:space-y-3 text-base sm:text-lg lg:text-xl max-w-2xl"
+            className="space-y-2 sm:space-y-3 md:space-y-4 text-base sm:text-lg md:text-xl lg:text-2xl w-full"
             style={{
               opacity: isVisible ? 1 : 0,
               transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
@@ -232,7 +242,7 @@ const ServiceSection = ({ service }) => {
 
           {/* Call to Action Button - Animated on scroll */}
           <button
-            className="mt-6 px-8 py-4 rounded-full font-bold text-lg shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.03] self-center lg:self-start"
+            className="mt-8 sm:mt-10 md:mt-12 lg:mt-14 px-8 py-4 rounded-full font-bold text-lg shadow-xl transition-all duration-300 hover:shadow-2xl hover:scale-[1.03] self-center lg:self-start"
             style={{
               backgroundColor: service.textColor,
               color: service.bgColor,
