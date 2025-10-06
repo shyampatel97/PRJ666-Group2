@@ -297,31 +297,36 @@ const [isMobile, setIsMobile] = useState(false);
 
       {/* Hero Section */}
       <section
-  className="relative h-screen bg-cover bg-left sm:bg-center bg-no-repeat pt-16"
-  style={{ backgroundImage: "url(/hero-part111.png)" }}
+  className="relative h-screen bg-cover bg-center sm:bg-center bg-no-repeat pt-16"
+  style={{ backgroundImage: "url(/hero-part11111.png)" }}
 >
         <div className="absolute inset-0 bg-black bg-opacity-0"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20 lg:py-32 h-full flex items-center">
           <div className="max-w-2xl">
             <h1
-              className="text-4xl sm:text-5xl md:text-5xl lg:text-8xl font-bold leading-tight mb-4 sm:mb-6"
-              style={{ color: "#ffffffff" }}
-            >
-              Agrocare
-              </h1>
+  className="text-6xl sm:text-5xl md:text-5xl lg:text-8xl font-bold leading-tight mb-4 sm:mb-6"
+  style={{
+    color: "#405527ff",
+    fontFamily: '"Open Sans", sans-serif',
+    textShadow: "4px 4px 5px #0000004d"
+  }}
+>
+  Agrocare
+</h1>
+
              
               <h1
   className="text-1xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 sm:mb-6"
-  style={{ color: "#ffffffff" }}
+  style={{ color: "#405527ff", fontFamily: '"Open Sans", sans-serif' }}
 >
   Nurturing Growth with AI
 </h1>
               
             
-            <p className="text-base sm:text-lg md:text-xl text-black leading-relaxed mb-6 sm:mb-8 max-w-lg" style={{ color: "#e9e9e9ff" }}>
+            <p className="text-base sm:text-lg md:text-xl text-black leading-relaxed mb-6 sm:mb-8 max-w-lg" style={{ color: "#82a561ff" , }}>
               Revolutionizing agriculture for a sustainable future. Empowering farmers with intelligent plant care.
             </p>
-            <button className="group bg-white text-green-800 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+            <button className="group bg-white text-green px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
               Get Started
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
             </button>
