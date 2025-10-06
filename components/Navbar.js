@@ -43,13 +43,13 @@ const Navbar = () => {
   });
 
   return (
-    <nav 
-      className={`sticky top-0 z-40 transition-all duration-500 ${
-        scrolled 
-          ? 'bg-white/80 backdrop-blur-x1 shadow-lg' 
-          : 'bg-white/95 backdrop-blur-md shadow-sm'
-      }`}
-    >
+   <nav 
+  className={`sticky top-0 z-40 transition-all duration-500 ${
+    scrolled 
+      ? 'bg-white/80 backdrop-blur-xl shadow-lg' // Corrected backdrop-blur-x1 to backdrop-blur-xl
+      : 'bg-white/50 backdrop-blur-md shadow-sm' // Changed bg-white/100 to bg-white/50 for blur visibility
+  }`}
+>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
