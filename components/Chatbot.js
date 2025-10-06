@@ -3,6 +3,61 @@ import { X, Send } from "lucide-react";
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const handleOpenChat = () => {
+    if (isMobile) {
+      window.location.href = "/chat";
+    } else {
+      setIsOpen(true);
+    }
+  };
+
+  return (
+    <>
+      {/* Floating Chat Button */}
+      <button
+        onClick={handleOpenChat}
+        className={`fixed bottom-6 right-6 z-50 p-4 rounded-full transition-all duration-300 ${
+          isOpen
+            ? "bg-red-500 hover:bg-red-600 scale-90"
+            : "bg-transparent hover:scale-110"
+        }`}
+        aria-label={isOpen ? "Close chat" : "Open chat"}
+      >
+        {isOpen ? (
+          <X className="w-6 h-6 text-white" />
+        ) : (
+          <div className="relative">
+            <img
+              src="/leafy.jpg"
+              alt="Leafy Assistant"
+              className="w-12 h-12 object-cover border-2 border-white rounded-full"
+            />
+          </div>
+        )}
+      </button>
+
+      {/* Desktop Chat Window */}
+      {!isMobile && (
+        <ChatWindow isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      )}
+    </>
+  );
+};
+
+const ChatWindow = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -46,7 +101,6 @@ const ChatBot = () => {
     setIsTyping(true);
 
     try {
-      // Get last 2 messages (1 user + 1 bot) for context
       const recentMessages = messages.slice(-2);
       const conversationHistory = recentMessages.map(msg => ({
         role: msg.sender === "user" ? "user" : "assistant",
@@ -58,7 +112,7 @@ const ChatBot = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           prompt: currentInput,
-          conversationHistory: conversationHistory, // Send context
+          conversationHistory: conversationHistory,
           systemPrompt: `You are Leafy, a friendly garden assistant for AgroCare. 
 
 IMPORTANT RULES:
@@ -124,30 +178,6 @@ Examples of what NOT to answer:
 
   return (
     <>
-      {/* Floating Chat Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-6 right-6 z-50 p-4 rounded-full transition-all duration-300 ${
-          isOpen
-            ? "bg-red-500 hover:bg-red-600 scale-90"
-            : "bg-transparent hover:scale-110"
-        }`}
-        aria-label={isOpen ? "Close chat" : "Open chat"}
-      >
-        {isOpen ? (
-          <X className="w-6 h-6 text-white" />
-        ) : (
-          <div className="relative">
-            <img
-              src="/leafy.jpg"
-              alt="Leafy Assistant"
-              className="w-12 h-12 object-cover border-2 border-white rounded-full"
-            />
-          </div>
-        )}
-      </button>
-
-      {/* Chat Window */}
       <div
         className={`fixed bottom-24 right-6 z-50 w-[380px] h-[550px] bg-white rounded-3xl shadow-2xl transition-all duration-500 transform ${
           isOpen
@@ -176,7 +206,7 @@ Examples of what NOT to answer:
             </div>
           </div>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={onClose}
             className="text-white hover:bg-white/20 p-1 rounded-full transition-colors"
             aria-label="Close chat"
           >
@@ -227,7 +257,6 @@ Examples of what NOT to answer:
             </div>
           ))}
 
-          {/* Typing Indicator */}
           {isTyping && (
             <div className="flex mb-4 justify-start">
               <div className="flex-shrink-0 mr-2">
@@ -289,11 +318,10 @@ Examples of what NOT to answer:
         </div>
       </div>
 
-      {/* Backdrop */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/10 backdrop-blur-sm z-40 transition-opacity duration-300"
-          onClick={() => setIsOpen(false)}
+          onClick={onClose}
         />
       )}
     </>

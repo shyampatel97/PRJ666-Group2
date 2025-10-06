@@ -1,6 +1,6 @@
 // index.js (Your Main Page File)
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Leaf,
   ArrowRight,
@@ -14,6 +14,7 @@ import Carousel from "@/components/Carousel";
 import ScrollServices from "@/components/ScrollServices";
 import ChatBot from "@/components/Chatbot";
 import StatsSection from "@/components/StatsSection";
+import MobileChatPage from "@/components/MobileChatPage";
 
 // Custom styles for hiding scrollbar
 const customStyles = `
@@ -142,6 +143,26 @@ useEffect(() => {
   }
 }, []);
 
+const [isMobile, setIsMobile] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+    
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Prevent hydration mismatch by not rendering until client-side
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "#283618" }}>
@@ -498,7 +519,9 @@ useEffect(() => {
         </div>
       </section>
       
-      <ChatBot />
+      <>
+      {isMobile ? <MobileChatPage /> : <ChatBot />}
+    </>
 
       {/* Plant Gallery Carousel */}
       <section style={{ backgroundColor: "#283618" }}>
