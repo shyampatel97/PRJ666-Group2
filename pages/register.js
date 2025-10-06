@@ -510,7 +510,6 @@ const handleImageUpload = async (file, error) => {
               onChange={handleImageUpload}
               loading={imageUploading}
               previewUrl={form.profile_image_url}
-              required
               placeholder="Upload Photo"
               loadingText="Uploading..."
               maxSizeText="5MB"
@@ -523,7 +522,6 @@ const handleImageUpload = async (file, error) => {
               name="location"
               label="Location"
               placeholder="Enter your location"
-              value={form.location}
               onChange={handleChange}
               variant="glassmorphism"
               required
