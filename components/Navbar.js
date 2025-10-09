@@ -136,10 +136,10 @@ const Navbar = () => {
 
                 {/* Dropdown */}
                 {showProfileDropdown && (
-                  <div className="absolute right-0 mt-1 w-52 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200 py-2 z-50">
+                  <div className="absolute right-0 mt-1 w-52 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-200 py-2 px-2 z-50">
                     <Link
                       href="/profile"
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200 mx-2"
+                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200"
                       onClick={() => setShowProfileDropdown(false)}
                     >
                       <User className="w-4 h-4 mr-3" />
@@ -148,7 +148,7 @@ const Navbar = () => {
                     <div className="h-px bg-gray-200 my-2"></div>
                     <button
                       onClick={handleLogout}
-                      className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200 mx-2"
+                      className="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200"
                     >
                       <LogOut className="w-4 h-4 mr-3" />
                       Sign out
