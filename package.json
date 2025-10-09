@@ -36,6 +36,7 @@
     "react-dom": "19.1.0",
     "react-router-dom": "^7.9.3"
   },
+  
   "devDependencies": {
     "@babel/core": "^7.28.4",
     "@babel/preset-env": "^7.28.3",
