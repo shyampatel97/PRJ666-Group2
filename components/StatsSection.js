@@ -1,10 +1,11 @@
 // components/StatsSection.js
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const StatsSection = () => {
   const sectionRef = useRef(null);
   const statsRef = useRef([]);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   const stats = [
     { label: "Accuracy Rate", value: 98, suffix: "%", color: "#283618" },
@@ -34,6 +35,8 @@ const StatsSection = () => {
             scrollTrigger: {
               trigger: sectionRef.current,
               start: "top 75%",
+              once: true, // THIS ENSURES IT ONLY ANIMATES ONCE
+              onEnter: () => setHasAnimated(true),
             },
             onUpdate: () => {
               el.textContent = i === 2

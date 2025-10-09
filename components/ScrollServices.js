@@ -43,14 +43,10 @@ const ServiceSection = ({ service }) => {
       }
     };
   }, []);
-
-  // Use a calculated padding top to account for the sticky Navbar.
-  // We use pt-20 to ensure content is below the main page's navigation bar.
   const paddingTop = "pt-20";
 
   return (
-    // The snap-start class is crucial for vertical scroll snapping on the main page.
-    // Added py-3 for 12px vertical padding (top and bottom spacing between sections)
+
     <section
       ref={sectionRef}
       id={service.id}

@@ -104,7 +104,8 @@ const Carousel = () => {
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="overflow-x-auto scrollbar-hide scroll-smooth"
+          // Changed: Added overflow-y-hidden to explicitly prevent vertical scrolling.
+          className="overflow-x-auto overflow-y-hidden scrollbar-hide scroll-smooth"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           <div className="flex gap-4 px-2">

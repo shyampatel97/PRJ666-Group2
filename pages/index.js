@@ -45,7 +45,7 @@ const servicesData = [
     image: "/plant-identify.JPG",
     buttonText: "Identify Now",
     content: [
-      "Instantly identify over 10,000 plant species with 98% accuracy using advanced computer vision technology trained on millions of botanical images. Simply snap a photo and get detailed information on care, growth habits, and ideal conditions. Perfect for gardeners, farmers, and plant enthusiasts of all levels.",
+      "Instantly identify over 10,000 plant species with 98% accuracy using advanced computer vision technology trained on millions of botanical images. Simply snap a photo and get detailed information on care, growth habits, and ideal growing conditions. Perfect for gardeners, farmers, and plant enthusiasts of all levels. With continuous AI learning, AgroCare improves its accuracy with every scan.",
     ],
   },
   {
@@ -69,7 +69,7 @@ const servicesData = [
     image: "/dashboard.JPG",
     buttonText: "Try Dashboard",
     content: [
-       "Track plant health daily with real-time updates and AI-powered insights. Monitor environmental conditions like soil, light, and weather while keeping a log of your activities and tasks. Gain personalized recommendations to optimize farming practices, improve efficiency, and maximize yields with data-driven decision making."
+      "Track plant health daily with real-time updates and AI-powered insights. Monitor environmental conditions like soil, light, and weather while keeping a log of your activities and tasks. Gain personalized recommendations to optimize farming practices, improve efficiency, and maximize yields with data-driven decision making.Stay ahead of issues with early disease detection and smart care tips for healthier crops.",
     ],
   },
   {
@@ -81,7 +81,7 @@ const servicesData = [
     image: "/marketplace.JPG",
     buttonText: "Search Products",
     content: [
-      "Discover a curated selection of farming essentials including organic seeds, eco-friendly fertilizers, and reliable tools all vetted by agricultural experts. Every product is tested and trusted by farmers to ensure quality and sustainability. Support ethical practices while making smart, responsible purchases that empower your farm's growth."
+      "Discover a curated selection of farming essentials including organic seeds, eco-friendly fertilizers, and reliable tools all vetted by agricultural experts. Every product is tested and trusted by farmers to ensure quality and sustainability. Support ethical practices while making smart, responsible purchases that empower your farm's growth.",
     ],
   },
 ];
@@ -89,10 +89,10 @@ const servicesData = [
 const HomePage = () => {
   // Inject custom styles for scrollbar hiding
   useEffect(() => {
-    const styleElement = document.createElement('style');
+    const styleElement = document.createElement("style");
     styleElement.innerHTML = customStyles;
     document.head.appendChild(styleElement);
-    
+
     return () => {
       document.head.removeChild(styleElement);
     };
@@ -127,35 +127,34 @@ const HomePage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    // Force scroll to top on page load
+    if (typeof window !== "undefined") {
+      window.history.scrollRestoration = "manual";
 
-useEffect(() => {
-  // Force scroll to top on page load
-  if (typeof window !== 'undefined') {
-    window.history.scrollRestoration = 'manual';
-    
-    // Immediate scroll
-    window.scrollTo(0, 0);
-    
-    // Also scroll after a brief delay to ensure everything is loaded
-    setTimeout(() => {
+      // Immediate scroll
       window.scrollTo(0, 0);
-    }, 0);
-  }
-}, []);
 
-const [isMobile, setIsMobile] = useState(false);
+      // Also scroll after a brief delay to ensure everything is loaded
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+      }, 0);
+    }
+  }, []);
+
+  const [isMobile, setIsMobile] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    
+
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
+
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    
+
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
@@ -228,19 +227,19 @@ const [isMobile, setIsMobile] = useState(false);
           height: 400px;
           position: relative;
         }
-        
+
         @media (min-width: 768px) {
           .photo-columns {
             height: 500px;
           }
         }
-        
+
         @media (min-width: 1024px) {
           .photo-columns {
             height: 600px;
           }
         }
-        
+
         .photo-column {
           display: flex;
           flex-direction: column;
@@ -248,13 +247,13 @@ const [isMobile, setIsMobile] = useState(false);
           transition: transform 0.1s ease-out;
           flex: 1;
         }
-        
+
         @media (min-width: 768px) {
           .photo-column {
             gap: 1rem;
           }
         }
-        
+
         .photo-column-reverse {
           flex-direction: column-reverse;
         }
@@ -265,13 +264,13 @@ const [isMobile, setIsMobile] = useState(false);
           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
           transition: transform 0.3s ease;
         }
-        
+
         @media (min-width: 768px) {
           .photo-item {
             border-radius: 1rem;
           }
         }
-        
+
         .photo-item:hover {
           transform: scale(1.05);
         }
@@ -281,13 +280,13 @@ const [isMobile, setIsMobile] = useState(false);
           object-fit: cover;
           display: block;
         }
-        
+
         @media (min-width: 768px) {
           .photo-item img {
             height: 180px;
           }
         }
-        
+
         @media (min-width: 1024px) {
           .photo-item img {
             height: 220px;
@@ -297,35 +296,59 @@ const [isMobile, setIsMobile] = useState(false);
 
       {/* Hero Section */}
       <section
-  className="relative h-screen bg-cover bg-center sm:bg-center bg-no-repeat pt-16"
-  style={{ backgroundImage: "url(/hero-part11111.PNG)" }}
->
+        className="relative h-screen bg-cover bg-center sm:bg-center bg-no-repeat pt-16"
+        style={{ backgroundImage: "url(/hero-copy.jpg)" }}
+      >
         <div className="absolute inset-0 bg-black bg-opacity-0"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20 lg:py-32 h-full flex items-center">
-          <div className="max-w-2xl">
+        <div className="relative w-full px-6 sm:px-10 py-12 sm:py-20 lg:py-32 h-full flex items-center">
+          <div className="text-left pl-10 sm:pl-16 lg:pl-28">
+            {" "}
+            {/* Added padding-left */}
+            {/* Main Title */}
             <h1
-  className="text-6xl sm:text-5xl md:text-5xl lg:text-8xl font-bold leading-tight mb-4 sm:mb-6"
-  style={{
-    color: "#405527ff",
-    fontFamily: '"Open Sans", sans-serif'
-  }}
->
-  Agrocare
-</h1>
-
-             
-              <h1
-  className="text-1xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 sm:mb-6"
-  style={{ color: "#405527ff", fontFamily: '"Open Sans", sans-serif' }}
->
-  Nurturing Growth with AI
-</h1>
-              
-            
-            <p className="text-base sm:text-lg md:text-xl text-black leading-relaxed mb-6 sm:mb-8 max-w-lg" style={{ color: "#82a561ff" , }}>
-              Revolutionizing agriculture for a sustainable future. Empowering farmers with intelligent plant care.
+              className="text-6xl sm:text-7xl md:text-8xl lg:text-[8rem] font-black leading-tight mb-3 sm:mb-5"
+              style={{
+                color: "#283618",
+                fontFamily: '"Open Sans", sans-serif',
+                fontOpticalSizing: "auto",
+                fontWeight: 900,
+                fontStyle: "normal",
+                fontVariationSettings: '"wdth" 100',
+              }}
+            >
+              Agrocare
+            </h1>
+            {/* Tagline */}
+            <h2
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold leading-tight mb-4 sm:mb-6"
+              style={{
+                color: "#283618",
+                fontFamily: '"Open Sans", sans-serif',
+                fontOpticalSizing: "auto",
+                fontWeight: 600,
+                fontStyle: "normal",
+                fontVariationSettings: '"wdth" 100',
+              }}
+            >
+              Nurturing Growth with Tech
+            </h2>
+            {/* Description */}
+            <p
+              className="text-base sm:text-lg md:text-xl font-normal leading-relaxed mb-6 sm:mb-8 max-w-xl"
+              style={{
+                color: "#82a561",
+                fontFamily: '"Open Sans", sans-serif',
+                fontOpticalSizing: "auto",
+                fontWeight: 400,
+                fontStyle: "normal",
+                fontVariationSettings: '"wdth" 100',
+              }}
+            >
+              Revolutionizing agriculture for a sustainable future. Empowering
+              farmers with intelligent plant care.
             </p>
-            <button className="group bg-white/50 text-green px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
+            {/* Button */}
+            <button className="group bg-white/50 text-[#283618] px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-base sm:text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2">
               Get Started
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
             </button>
@@ -334,64 +357,60 @@ const [isMobile, setIsMobile] = useState(false);
       </section>
 
       {/* Mission Section and Parallax Photos */}
-      <section className="py-12 sm:py-16 md:py-20" style={{ backgroundColor: "#283618" }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-start">
-            {/* Left Content */}
-            <div className="space-y-6 sm:space-y-8">
-              <div>
-                <h2
-                  className="mission-title text-left mb-4 sm:mb-6"
-                  style={{
-                    fontFamily: '"Arial Black", Gadget, sans-serif',
-                    fontSize: "clamp(24px, 5vw, 40px)",
-                    letterSpacing: "-1.6px",
-                    wordSpacing: "-2.6px",
-                    color: "#f0ead2",
-                    fontWeight: 400,
-                    textDecoration: "rgb(68, 68, 68)",
-                    fontStyle: "normal",
-                    fontVariant: "small-caps",
-                    textTransform: "capitalize",
-                    lineHeight: "1.2",
-                  }}
-                >
-                  Every leaf tells a story <br />
-                  Agrocare helps you read it and act in time.
-                </h2>
-              </div>
-              <div className="space-y-2 text-base sm:text-lg text-gray-700 leading-relaxed">
-                <p
-                  className="mission-p1 transition-colors duration-300 cursor-default text-left"
-                  style={{
-                    fontFamily: '"Arial", Gadget, sans-serif',
-                    fontSize: "clamp(14px, 3vw, 18px)",
-                    fontWeight: 400,
-                    color: "#fefae0",
-                    lineHeight: "1.8",
-                  }}
-                >
-                  At{" "}
-                  <span className="font-bold" style={{ color: "#b38a58" }}>
-                    AgroCare
-                  </span>
-                  , we are dedicated to supporting the agriculture industry
-                  through smart, user-friendly technology. Our AI-powered
-                  platform delivers farmers and agricultural professionals
-                  timely, practical insights for monitoring crop health. From
-                  identifying diseases in early stages to providing targeted
-                  treatment guidance, help increase harvests, minimize crop
-                  losses, and promote sustainable farming practices for the
-                  future.
-                </p>
-                <div className="flex items-center gap-2 text-green-600 font-semibold pt-4 mission-tagline justify-start">
-                  <Leaf className="w-5 h-5 sm:w-6 sm:h-6 hover:rotate-12 hover:scale-110 transition-transform duration-300 ease-in-out" />
-                  <span className="text-base sm:text-lg md:text-xl hover:scale-105 transition-transform duration-200 ease-in-out cursor-default">
-                    Growing smarter. Farming better. Together.
-                  </span>
-                </div>
-              </div>
-            </div>
+      <section
+        className="py-12 sm:py-16 md:py-20"
+        style={{ backgroundColor: "#283618" }}
+      >
+        <div className="max-w-7xl mx-auto px-2 sm:px-4"> {/* reduced side padding */}
+    <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-start">
+      {/* Left Content */}
+      <div className="space-y-6 sm:space-y-8 -ml-4 sm:-ml-8"> {/* shifted left */}
+        <div>
+          <h2
+            className="mission-title text-left mb-4 sm:mb-6"
+            style={{
+              fontFamily: '"Arial Black", Gadget, sans-serif',
+              fontSize: "clamp(24px, 5vw, 40px)",
+              letterSpacing: "-1.6px",
+              wordSpacing: "-2.6px",
+              color: "#f0ead2",
+              fontWeight: 400,
+              textDecoration: "rgb(68, 68, 68)",
+              fontStyle: "normal",
+              fontVariant: "small-caps",
+              textTransform: "capitalize",
+              lineHeight: "1.2",
+            }}
+          >
+            Every leaf tells a story <br />
+            Agrocare helps you read it and act in time.
+          </h2>
+        </div>
+        <div className="space-y-2 text-base sm:text-lg text-gray-700 leading-relaxed">
+          <p
+            className="mission-p1 transition-colors duration-300 cursor-default text-left"
+            style={{
+              fontFamily: '"Arial", Gadget, sans-serif',
+              fontSize: "clamp(18px, 3.5vw, 24px)",
+              fontWeight: 400,
+              color: "#fefae0",
+              lineHeight: "1.8",
+            }}
+          >
+            At{" "}
+            <span className="font-bold" style={{ color: "#b38a58" }}>
+              AgroCare
+            </span>
+            , we are dedicated to supporting the agriculture industry through
+            smart, user-friendly technology. Our AI-powered platform delivers
+            farmers and agricultural professionals timely, practical insights for
+            monitoring crop health. From identifying diseases in early stages to
+            providing targeted treatment guidance, help increase harvests,
+            minimize crop losses, and promote sustainable farming practices for
+            the future.
+          </p>
+        </div>
+      </div>
 
             {/* Right Photo Columns */}
             <div className="photo-columns">
@@ -528,10 +547,8 @@ const [isMobile, setIsMobile] = useState(false);
           </button>
         </div>
       </section>
-      
-      <>
-      {isMobile ? <MobileChatPage /> : <ChatBot />}
-    </>
+
+      <>{isMobile ? <MobileChatPage /> : <ChatBot />}</>
 
       {/* Plant Gallery Carousel */}
       <section style={{ backgroundColor: "#283618" }}>
