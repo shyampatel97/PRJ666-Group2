@@ -1,4 +1,4 @@
-// pages/identification.js - REVISED FOR SMALLER, EQUAL-HEIGHT MATCH CARDS AND DYNAMIC RIGHT COLUMN HEIGHT
+// pages/identification.js - WITH SEARCH FUNCTIONALITY
 
 import React, { useState, useEffect } from "react";
 import {
@@ -24,8 +24,9 @@ import {
 import Navbar from "@/components/Navbar";
 import ChatBot from "@/components/Chatbot";
 import { motion, AnimatePresence } from "framer-motion";
+import UnifiedUploadComponent from "@/components/UnifiedUploadComponent";
 
-// --- ANIMATION VARIANTS (Keeping existing for consistency) ---
+// --- ANIMATION VARIANTS ---
 const cardVariants = {
   hidden: { opacity: 0, y: 20, scale: 0.95 },
   visible: {
@@ -56,205 +57,7 @@ const detailVariants = {
   },
 };
 
-// ... (UnifiedUploadComponent remains the same - code omitted for brevity)
-const UnifiedUploadComponent = ({ onImageSelect, onClear, imagePreview }) => {
-  const [showCamera, setShowCamera] = useState(false);
-  const [stream, setStream] = useState(null);
-  const videoRef = React.useRef(null);
-  const canvasRef = React.useRef(null);
-
-  const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-      });
-
-      setStream(mediaStream);
-      setShowCamera(true);
-
-      setTimeout(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-        }
-      }, 100);
-    } catch (error) {
-      console.error("Error accessing camera:", error);
-      alert(
-        "Unable to access camera. Please check permissions or upload a file instead."
-      );
-    }
-  };
-
-  const stopCamera = () => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
-    }
-    setShowCamera(false);
-  };
-
-  const capturePhoto = () => {
-    if (!videoRef.current || !canvasRef.current) return;
-
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const context = canvas.getContext("2d");
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0);
-
-    canvas.toBlob(
-      (blob) => {
-        if (blob) {
-          const file = new File([blob], `camera-capture-${Date.now()}.jpg`, {
-            type: "image/jpeg",
-          });
-
-          const previewUrl = URL.createObjectURL(blob);
-          onImageSelect(file, previewUrl);
-          stopCamera();
-        }
-      },
-      "image/jpeg",
-      0.9
-    );
-  };
-
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      onImageSelect(file, previewUrl);
-    }
-  };
-
-  React.useEffect(() => {
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, [stream]);
-
-  if (showCamera) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
-        <div className="relative w-full h-full max-w-4xl max-h-4xl">
-          <button
-            onClick={stopCamera}
-            className="absolute top-4 right-4 z-10 w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center text-white backdrop-blur-sm hover:bg-opacity-30 transition-all"
-          >
-            <X className="w-6 h-6" />
-          </button>
-
-          <div className="w-full h-full flex flex-col items-center justify-center">
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="w-full h-full object-contain rounded-xl shadow-2xl"
-              style={{ maxHeight: "calc(100vh - 120px)" }}
-            />
-
-            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-              <button
-                onClick={capturePhoto}
-                className="w-20 h-20 border-4 border-white bg-green-800 rounded-full flex items-center justify-center shadow-xl hover:bg-green-700 transition-colors duration-300"
-              >
-                <Camera className="w-8 h-8 text-white" />
-              </button>
-            </div>
-
-            <div className="absolute top-4 left-4 bg-green-950 bg-opacity-70 rounded-full px-4 py-2 backdrop-blur-sm">
-              <p className="text-white text-sm font-medium">
-                Center the species and tap the capture button
-              </p>
-            </div>
-          </div>
-
-          <canvas ref={canvasRef} className="hidden" />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative">
-      {!imagePreview ? (
-        <div className="relative">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            className="hidden"
-            id="image-upload"
-          />
-
-          <div className="border border-gray-200 rounded-2xl shadow-xl overflow-hidden bg-white hover:shadow-2xl transition-all duration-300">
-            <div className="grid grid-cols-2 divide-x divide-gray-200">
-              <label
-                htmlFor="image-upload"
-                className="flex flex-col items-center px-6 py-10 bg-sand-50 hover:bg-sand-100 cursor-pointer transition-colors"
-              >
-                <div className="w-14 h-14 bg-sand-200 rounded-full flex items-center justify-center mb-4 border border-sand-300 transform hover:scale-110 transition-transform duration-300">
-                  <Upload className="w-7 h-7 text-green-800" />
-                </div>
-                <div className="text-center">
-                  <p className="text-gray-800 font-bold mb-1">
-                    Upload from Device
-                  </p>
-                  <p className="text-gray-500 text-sm">
-                    Choose from gallery or files
-                  </p>
-                </div>
-              </label>
-
-              <button
-                onClick={startCamera}
-                className="flex flex-col items-center px-6 py-10 bg-sand-50 hover:bg-sand-100 transition-colors"
-              >
-                <div className="w-14 h-14 bg-sand-200 rounded-full flex items-center justify-center mb-4 border border-sand-300 transform hover:scale-110 transition-transform duration-300">
-                  <Camera className="w-7 h-7 text-green-800" />
-                </div>
-                <div className="text-center">
-                  <p className="text-gray-800 font-bold mb-1">Take Photo</p>
-                  <p className="text-gray-500 text-sm">
-                    Use camera to capture instantly
-                  </p>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="relative">
-          <motion.img
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 200, damping: 25 }}
-            src={imagePreview}
-            alt="Selected plant"
-            className="w-full max-w-sm h-64 mx-auto rounded-3xl shadow-xl border-4 border-green-700 object-cover transform scale-100 hover:scale-[1.01] transition-transform duration-300"
-          />
-          <button
-            onClick={onClear}
-            className="absolute -top-3 -right-3 w-10 h-10 bg-white border-2 border-green-600 text-green-800 rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-colors z-10"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// --- REVISED PlantCard Component for Horizontal Layout ---
+// --- PlantCard Component ---
 const PlantCard = ({ plant, isMainResult = false, index = 0, activeTab }) => {
   const [imageError, setImageError] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -282,10 +85,8 @@ const PlantCard = ({ plant, isMainResult = false, index = 0, activeTab }) => {
   return (
     <motion.div
       variants={cardVariants}
-      // REVISED: Using items-stretch and flex-auto for consistent height based on content
       className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden transform hover:translate-y-[-2px] transition-all duration-300 group flex h-auto items-stretch"
     >
-      {/* REVISED: SQUARE IMAGE CONTAINER - Fixed width (w-32) and h-full to match card height */}
       <div className="w-32 h-full bg-sand-100 relative flex-shrink-0">
         {hasValidImage && currentImage ? (
           <img
@@ -306,16 +107,12 @@ const PlantCard = ({ plant, isMainResult = false, index = 0, activeTab }) => {
         )}
       </div>
 
-      {/* REVISED: Text Content Area - Use flex-grow and justify-between to push percentage to the right */}
       <div className="p-3 bg-sand-50 flex flex-grow justify-between items-center min-h-[120px]">
-        {/* Left-side Content (Name, Category, Confidence Bar) */}
         <div className="flex flex-col justify-center flex-grow pr-4">
-          {/* Main Name */}
           <h3 className="text-lg font-bold text-gray-800 leading-tight mb-2 truncate">
             {plant.name || plant.identified_name || "Alternative Match"}
           </h3>
 
-          {/* Category Badge */}
           <div className="mb-2 flex items-center">
             <span className="text-xs font-semibold text-gray-500 mr-2">
               Category:
@@ -327,7 +124,6 @@ const PlantCard = ({ plant, isMainResult = false, index = 0, activeTab }) => {
             </span>
           </div>
 
-          {/* Confidence Bar (remains compact) */}
           <div>
             <span className="text-xs text-gray-600 font-medium block mb-1">
               Match Confidence
@@ -343,7 +139,6 @@ const PlantCard = ({ plant, isMainResult = false, index = 0, activeTab }) => {
           </div>
         </div>
 
-        {/* NEW: Percentage Match on the far right of the card */}
         <div className="flex-shrink-0 self-center pl-4 border-l border-gray-100">
           <div
             className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl shadow-inner ${confidenceColorClass} transition-all duration-300 group-hover:scale-105`}
@@ -361,7 +156,7 @@ const PlantCard = ({ plant, isMainResult = false, index = 0, activeTab }) => {
   );
 };
 
-// ... (PlantDetailsCard remains the same - code omitted for brevity)
+// --- PlantDetailsCard Component ---
 const PlantDetailsCard = ({ details, loading, plantName }) => {
   if (loading) {
     return (
@@ -389,10 +184,8 @@ const PlantDetailsCard = ({ details, loading, plantName }) => {
       animate="visible"
       className="max-w-7xl mx-auto space-y-10"
     >
-      {/* Header with Plant Name - Deep Green */}
       <div className="bg-gradient-to-br from-green-800 to-green-950 rounded-3xl shadow-2xl p-12 text-white">
         <div className="flex items-center space-x-4 mb-4">
-         
           <h1 className="text-5xl font-extrabold">{plantName}</h1>
         </div>
         <p className="text-green-200 text-lg leading-relaxed mt-4 border-l-4 border-green-600 pl-4 transition-all duration-500">
@@ -400,13 +193,8 @@ const PlantDetailsCard = ({ details, loading, plantName }) => {
         </p>
       </div>
 
-      {/* Aesthetic Two Column Layout - REVISED TO FLEX FOR EQUAL HEIGHTS ON LG+ */}
-      {/* Changed from grid to flex and added lg:items-stretch */}
       <div className="flex flex-col lg:flex-row gap-8 lg:items-stretch">
-        
-        {/* Left Column - 40% width on desktop */}
         <div className="lg:w-2/5 space-y-8 flex flex-col">
-          {/* What Does It Look Like Section - Beige/Sand Theme */}
           <div className="bg-sand-50 rounded-3xl shadow-lg border border-sand-200 p-8 transform hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-center space-x-3 mb-4 border-b pb-3 border-sand-200">
               <div className="w-10 h-10 bg-sand-200 rounded-lg flex items-center justify-center shadow-inner">
@@ -471,7 +259,6 @@ const PlantDetailsCard = ({ details, loading, plantName }) => {
           </div>
         </div>
 
-        {/* Right Column - 60% width on desktop */}
         <div className="lg:w-3/5 space-y-8 flex flex-col">
           <div className="bg-rose-50 rounded-3xl shadow-lg border border-rose-200 p-8 transform hover:shadow-xl transition-shadow duration-300">
             <div className="flex items-center space-x-3 mb-4 border-b pb-3 border-rose-200">
@@ -498,7 +285,6 @@ const PlantDetailsCard = ({ details, loading, plantName }) => {
               ))}
             </ul>
           </div>
-          {/* Added flex-grow to the last item in the right column to ensure it fills any remaining vertical space */}
           <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8 transform hover:shadow-2xl transition-shadow duration-300 flex-grow">
             <div className="flex items-center space-x-3 mb-4 border-b pb-3 border-gray-200">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shadow-inner">
@@ -545,6 +331,25 @@ const IdentificationPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [plantDetails, setPlantDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [searchResults, setSearchResults] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
+  useEffect(() => {
+    const savedResult = sessionStorage.getItem('identificationResult');
+    const savedImagePreview = sessionStorage.getItem('imagePreview');
+    const savedPlantDetails = sessionStorage.getItem('plantDetails');
+    
+    if (savedResult) {
+      setResult(JSON.parse(savedResult));
+    }
+    if (savedImagePreview) {
+      setImagePreview(savedImagePreview);
+    }
+    if (savedPlantDetails) {
+      setPlantDetails(JSON.parse(savedPlantDetails));
+    }
+  }, []);
 
   useEffect(() => {
     fetch("/api/auth/session")
@@ -575,6 +380,7 @@ const IdentificationPage = () => {
     setError(null);
     setPlantDetails(null);
   };
+
   const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
@@ -595,6 +401,7 @@ const IdentificationPage = () => {
       throw new Error("Image upload failed: " + error.message);
     }
   };
+
   const fetchPlantDetails = async (plantName) => {
     setLoadingDetails(true);
     try {
@@ -607,12 +414,117 @@ const IdentificationPage = () => {
       });
       const data = await response.json();
       setPlantDetails(data.details);
+      sessionStorage.setItem('plantDetails', JSON.stringify(data.details));
     } catch (error) {
       console.error("Error fetching plant details:", error);
     } finally {
       setLoadingDetails(false);
     }
   };
+
+  const handleSearchPlant = async (e) => {
+    e?.preventDefault();
+    
+    if (!searchQuery.trim()) return;
+    
+    if (!user) {
+      setError("Please log in to search plants");
+      return;
+    }
+
+    setIsSearching(true);
+    setError(null);
+    setShowSearchResults(true);
+
+    try {
+      const response = await fetch(
+        `/api/search-plant?q=${encodeURIComponent(searchQuery.trim())}&limit=10&language=en`
+      );
+
+      if (!response.ok) {
+        throw new Error("Plant search failed");
+      }
+
+      const searchData = await response.json();
+      console.log("Search Results:", searchData);
+      console.log("Results array:", searchData.results);
+      console.log("Results length:", searchData.results?.length);
+      console.log("Show search results state:", true);
+      
+      setSearchResults(searchData);
+      setShowSearchResults(true); // Ensure it's set again after data arrives
+      
+    } catch (error) {
+      console.error("Search error:", error);
+      setError(error.message);
+      setSearchResults(null);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSelectSearchResult = async (result) => {
+    console.log("Selected search result:", result);
+    setLoadingDetails(true);
+    setShowSearchResults(false);
+    setSearchQuery(""); // Clear the search
+    
+    try {
+      // Use your existing OpenAI-based plant details endpoint
+      console.log("Fetching plant details for:", result.name);
+      
+      const response = await fetch("/api/get-plant-details", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ plantName: result.name }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch plant details");
+      }
+
+      const data = await response.json();
+      console.log("Plant details received:", data);
+      
+      // Create a result object similar to identification result
+      const searchResult = {
+        identified: true,
+        identified_name: result.name,
+        species: result.name,
+        category: activeTab,
+        confidence: 1.0, // Search results are exact matches
+        similar_images: result.thumbnail 
+          ? [{ url: `data:image/jpeg;base64,${result.thumbnail}` }] 
+          : [],
+        alternative_suggestions: [],
+        plant_details: {}
+      };
+
+      console.log("Setting result state:", searchResult);
+      setResult(searchResult);
+      sessionStorage.setItem('identificationResult', JSON.stringify(searchResult));
+      
+      // Set the detailed plant information from OpenAI
+      console.log("Setting plant details:", data.details);
+      setPlantDetails(data.details);
+      sessionStorage.setItem('plantDetails', JSON.stringify(data.details));
+      
+    } catch (error) {
+      console.error("Error loading plant details:", error);
+      setError("Failed to load plant details: " + error.message);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setSearchResults(null);
+    setShowSearchResults(false);
+  };
+
   const handleIdentifyPlant = async () => {
     if (!selectedImage) return;
 
@@ -648,6 +560,8 @@ const IdentificationPage = () => {
 
       const identificationResult = await response.json();
       setResult(identificationResult);
+      sessionStorage.setItem('identificationResult', JSON.stringify(identificationResult));
+      sessionStorage.setItem('imagePreview', imagePreview);
 
       if (
         identificationResult.identified &&
@@ -672,6 +586,7 @@ const IdentificationPage = () => {
     setError(null);
     setPlantDetails(null);
   };
+
   const tabs = ["Plants", "Insects"];
 
   const getTabIcon = (tab) => {
@@ -685,14 +600,7 @@ const IdentificationPage = () => {
     }
   };
 
-  // --- REVISED LOGIC: Remove dynamic height calculation and rely on Flexbox with max-height ---
-  // The dynamic height calculation was locking the container height and causing the empty space.
-  // We will now rely on the 'flex-col' container with 'max-h-[540px]' and 'overflow-hidden'
-  // to clip the content if it exceeds the max height (i.e., when > 3 cards appear).
-
   const matchContainerStyle = { maxHeight: '540px' };
-  // --- END REVISED LOGIC ---
-
 
   return (
     <div className="min-h-screen bg-sand-50">
@@ -704,10 +612,7 @@ const IdentificationPage = () => {
             <h1 className="text-5xl font-extrabold text-gray-900 mb-4 animate-fade-in-down">
               AI Species Identifier
             </h1>
-            <p className="text-gray-600 text-lg max-w-3xl mx-auto animate-fade-in-up">
-              Quickly identify any Plant or Insect using our advanced AI, and
-              receive tailored care recommendations.
-            </p>
+            
           </header>
 
           <AnimatePresence>
@@ -725,13 +630,24 @@ const IdentificationPage = () => {
                 </div>
               </motion.div>
             )}
+            
+            {loadingDetails && !result && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="mb-8 bg-blue-100 border-2 border-blue-400 rounded-2xl p-5"
+              >
+                <div className="flex items-center space-x-4">
+                  <Loader2 className="w-6 h-6 text-blue-700 animate-spin" />
+                  <p className="text-blue-800 font-semibold">Loading plant details...</p>
+                </div>
+              </motion.div>
+            )}
           </AnimatePresence>
 
-          {/* -------------------------------------------------------------------------- */}
-          {/* TOP ROW: Two Columns (Upload Box on Left, Best Matches on Right) */}
-          {/* -------------------------------------------------------------------------- */}
           <div className="flex flex-col lg:flex-row gap-8 mb-8">
-            {/* LEFT COLUMN: Upload Box (Takes up 1/2 of space) */}
             <motion.div
               initial={result ? { opacity: 0, y: 30 } : { opacity: 1, y: 0 }}
               animate={{ opacity: 1, y: 0 }}
@@ -791,38 +707,175 @@ const IdentificationPage = () => {
                   />
 
                   <div className="mt-6 pt-4 border-t border-gray-100">
-                    <div className="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-3 max-w-md mx-auto">
-                      <div className="relative flex-1 w-full">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                          type="text"
-                          placeholder={`Search ${activeTab.toLowerCase()} database by name...`}
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-700 focus:border-green-700 outline-none transition-colors duration-300 text-sm"
-                        />
+                    <form onSubmit={handleSearchPlant} className="space-y-3">
+                      <div className="flex flex-col md:flex-row items-center space-y-3 md:space-y-0 md:space-x-3 max-w-md mx-auto">
+                        <div className="relative flex-1 w-full">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                          <input
+                            type="text"
+                            placeholder={`Search ${activeTab.toLowerCase()} database by name...`}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onFocus={() => searchResults && setShowSearchResults(true)}
+                            className="w-full pl-9 pr-9 py-2.5 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-700 focus:border-green-700 outline-none transition-colors duration-300 text-sm"
+                          />
+                          {searchQuery && (
+                            <button
+                              type="button"
+                              onClick={clearSearch}
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex space-x-2 w-full md:w-auto">
+                          <button
+                            type="submit"
+                            disabled={isSearching || !user || !searchQuery.trim()}
+                            className="flex-1 md:flex-none px-4 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg text-sm"
+                          >
+                            {isSearching ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Searching...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Search className="w-4 h-4" />
+                                <span>Search</span>
+                              </>
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleIdentifyPlant}
+                            disabled={
+                              uploading || identifying || !user || !selectedImage
+                            }
+                            className="flex-1 md:flex-none px-4 py-2.5 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg text-sm"
+                          >
+                            {uploading || identifying ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span className="text-sm">
+                                  {uploading ? "Uploading..." : "Analyzing..."}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <Lightbulb className="w-4 h-4" />
+                                <span>Identify</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </div>
-                      <button
-                        onClick={handleIdentifyPlant}
-                        disabled={
-                          uploading || identifying || !user || !selectedImage
-                        }
-                        className="w-full md:w-auto px-6 py-2.5 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transform hover:scale-[1.01]"
-                      >
-                        {uploading || identifying ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            <span className="text-sm">
-                              {uploading ? "Uploading..." : "Analyzing..."}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="flex items-center text-sm">
-                            <Lightbulb className="w-4 h-4 mr-1" /> Identify Now
-                          </span>
+
+                      {/* Debug info - remove after testing */}
+                      {searchResults && (
+                        <div className="text-xs text-gray-500 text-center">
+                          Debug: {searchResults.results?.length || 0} results, showSearchResults: {showSearchResults.toString()}
+                        </div>
+                      )}
+
+                      <AnimatePresence>
+                        {showSearchResults && searchResults && searchResults.results.length > 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            className="max-w-md mx-auto"
+                          >
+                            <div className="w-full bg-white rounded-xl shadow-2xl border-2 border-green-200 max-h-96 overflow-y-auto">
+                              <div className="sticky top-0 p-3 border-b border-gray-200 bg-gradient-to-r from-green-50 to-blue-50 z-10">
+                                <div className="flex items-center justify-between">
+                                  <p className="text-sm font-bold text-gray-800 flex items-center">
+                                    <Search className="w-4 h-4 mr-2 text-green-600" />
+                                    Found {searchResults.total_results} result{searchResults.total_results !== 1 ? 's' : ''}
+                                  </p>
+                                  <button
+                                    onClick={() => setShowSearchResults(false)}
+                                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="divide-y divide-gray-100">
+                                {searchResults.results.map((result, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => handleSelectSearchResult(result)}
+                                    disabled={loadingDetails}
+                                    className="w-full text-left px-4 py-3 hover:bg-gradient-to-r hover:from-green-50 hover:to-blue-50 transition-all duration-200 flex items-center space-x-3 group disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {result.thumbnail ? (
+                                      <img
+                                        src={`data:image/jpeg;base64,${result.thumbnail}`}
+                                        alt={result.name}
+                                        className="w-14 h-14 rounded-xl object-cover flex-shrink-0 border-2 border-gray-200 group-hover:border-green-400 transition-colors shadow-sm"
+                                      />
+                                    ) : (
+                                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-100 to-blue-100 flex items-center justify-center flex-shrink-0 border-2 border-gray-200 group-hover:border-green-400 transition-colors">
+                                        <Leaf className="w-7 h-7 text-green-600" />
+                                      </div>
+                                    )}
+                                    <div className="flex-1 min-w-0">
+                                      <p className="font-bold text-gray-900 truncate text-base group-hover:text-green-700 transition-colors">
+                                        {result.name}
+                                      </p>
+                                      <p className="text-xs text-gray-500 truncate mt-0.5">
+                                        <span className="font-medium">Match:</span> {result.matched_in}
+                                        {result.matched_type !== 'entity_name' && (
+                                          <span className="ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-semibold uppercase">
+                                            {result.matched_type === 'synonym' ? 'Synonym' : result.matched_type}
+                                          </span>
+                                        )}
+                                      </p>
+                                    </div>
+                                    <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <div className="bg-green-600 rounded-full p-1.5">
+                                        <CheckCircle className="w-4 h-4 text-white" />
+                                      </div>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                              {searchResults.results_trimmed && (
+                                <div className="p-3 bg-gray-50 border-t border-gray-200 text-center">
+                                  <p className="text-xs text-gray-600">
+                                    Showing top {searchResults.limit} results. Refine your search for more specific results.
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
                         )}
-                      </button>
-                    </div>
+                        
+                        {showSearchResults && searchResults && searchResults.results.length === 0 && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            className="max-w-md mx-auto"
+                          >
+                            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-xl p-5 text-center shadow-lg">
+                              <AlertCircle className="w-8 h-8 text-yellow-600 mx-auto mb-3" />
+                              <h3 className="font-bold text-gray-800 mb-1">No Results Found</h3>
+                              <p className="text-sm text-gray-700">
+                                No plants found matching {searchQuery}
+                              </p>
+                              <p className="text-xs text-gray-600 mt-2">
+                                Try searching by scientific name, common name, or synonyms.
+                              </p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </form>
                   </div>
                 </div>
               </div>
@@ -865,7 +918,6 @@ const IdentificationPage = () => {
               )}
             </motion.div>
 
-            {/* RIGHT COLUMN: Best Species Matches (Takes up 1/2 of space) */}
             {result && (
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -880,23 +932,19 @@ const IdentificationPage = () => {
               >
                 <div
                   className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col p-6 transition-all duration-300"
-                  // Use max-height to impose the limit and rely on flex-grow for space distribution
                   style={matchContainerStyle}
                 >
                   <h2 className="text-xl font-bold text-gray-900 mb-4 border-b-2 border-green-700 pb-2 flex-shrink-0">
                     Best Species Matches
                   </h2>
 
-                  {/* Flex container for match cards */}
                   {result.identified && result.identified_name ? (
                     <motion.div
                       variants={containerVariants}
                       initial="hidden"
                       animate="visible"
-                      // Use space-y-3 to separate cards, flex-col for stacking. flex-grow will distribute space
                       className="flex flex-col space-y-3 flex-grow"
                     >
-                      {/* Primary Match */}
                       <div>
                         <PlantCard
                           plant={result}
@@ -905,7 +953,6 @@ const IdentificationPage = () => {
                         />
                       </div>
 
-                      {/* Alternative Matches */}
                       {result?.alternative_suggestions?.slice(0, 2).map((suggestion, index) => (
                         <div key={index}>
                           <PlantCard
@@ -926,7 +973,7 @@ const IdentificationPage = () => {
                         Species Not Identified
                       </h3>
                       <p className="text-gray-600 text-sm max-w-xs mx-auto">
-                        The AI couldn’t confidently match this image. Try a
+                        The AI could not confidently match this image. Try a
                         clearer, closer photo or use the search bar.
                       </p>
                     </div>
@@ -935,9 +982,7 @@ const IdentificationPage = () => {
               </motion.div>
             )}
           </div>
-          {/* -------------------------------------------------------------------------- */}
-          {/* BOTTOM ROW: Full Species Details (Full Width) */}
-          {/* -------------------------------------------------------------------------- */}
+
           {result && (
             <motion.div
               initial={{ opacity: 0, y: 30 }}

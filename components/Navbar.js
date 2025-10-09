@@ -49,7 +49,7 @@ const Navbar = () => {
       className={`sticky top-0 z-40 transition-all duration-500 ${
         scrolled
           ? "bg-[#fbf6eb]/50 backdrop-blur-xl"
-          : "bg-[#fbf6eb]/50 backdrop-blur-md"
+          : "bg-white/50 backdrop-blur-md"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -75,7 +75,7 @@ const Navbar = () => {
                   className="relative px-4 py-2"
                 >
                   <span
-                    className={`relative z-10 text-sm font-medium transition-colors duration-300 ${
+                    className={`relative z-10 text-sm font-medium transition-colors duration-300 text-[1.2rem] ${
                       isActive ? "text-[#1c352d]" : "text-gray-700"
                     }`}
                   >
