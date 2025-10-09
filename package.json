@@ -29,14 +29,13 @@
     "mongoose": "^8.18.0",
     "multer": "^2.0.2",
     "next": "15.5.0",
-    "next-auth": "^1.12.1",
+    "next-auth": "^4.24.11",
     "nodemailer": "^6.10.1",
     "openai": "^6.1.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-router-dom": "^7.9.3"
   },
-  
   "devDependencies": {
     "@babel/core": "^7.28.4",
     "@babel/preset-env": "^7.28.3",
