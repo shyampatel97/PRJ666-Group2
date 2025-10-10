@@ -1,4 +1,4 @@
-// pages/identification.js - WITH SEARCH FUNCTIONALITY
+// pages/identification.js - WITH IMAGE MODAL
 
 import React, { useState, useEffect } from "react";
 import {
@@ -57,10 +57,72 @@ const detailVariants = {
   },
 };
 
+// --- ImageModal Component ---
+const ImageModal = ({ isOpen, imageUrl, plantName, onClose }) => {
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={onClose}
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full h-full flex items-center justify-center"
+          >
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              className="absolute top-8 right-8 z-10 bg-white hover:bg-gray-300 rounded-full p-2 transition-all duration-300 shadow-lg hover:shadow-xl"
+              aria-label="Close image"
+            >
+              <X className="w-6 h-6 text-gray-900" />
+            </button>
+
+            {/* Image */}
+            <img
+              src={imageUrl}
+              alt={plantName}
+              className="w-auto h-auto max-w-full max-h-screen object-contain"
+            />
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
+
 // --- PlantCard Component ---
 const PlantCard = ({ plant, isMainResult = false, index = 0, activeTab }) => {
   const [imageError, setImageError] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   let images = [];
   if (plant.similar_images && plant.similar_images.length > 0) {
@@ -78,81 +140,99 @@ const PlantCard = ({ plant, isMainResult = false, index = 0, activeTab }) => {
     }
   };
 
+  const handleImageClick = () => {
+    if (hasValidImage && currentImage) {
+      setSelectedImage(currentImage.url);
+    }
+  };
+
   const confidence = isMainResult ? plant.confidence : plant.probability;
   const confidenceColorClass = isMainResult ? "bg-green-700" : "bg-amber-600";
   const textClass = isMainResult ? "text-green-900" : "text-amber-800";
 
   return (
-    <motion.div
-      variants={cardVariants}
-      className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden transform hover:translate-y-[-2px] transition-all duration-300 group flex h-auto items-stretch"
-    >
-      <div className="w-32 h-full bg-sand-100 relative flex-shrink-0">
-        {hasValidImage && currentImage ? (
-          <img
-            src={currentImage.url}
-            alt={plant.name || plant.identified_name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.10]"
-            onError={handleImageError}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-sand-100 to-sand-200 p-2">
-            <div className="text-center">
-              <Leaf className="w-7 h-7 text-sand-500 mx-auto mb-1" />
-              <p className="text-[11px] text-sand-700 font-medium px-1 leading-tight">
-                {plant.name || plant.identified_name || "Unknown"}
-              </p>
+    <>
+      <motion.div
+        variants={cardVariants}
+        className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden transform hover:translate-y-[-2px] transition-all duration-300 group flex h-auto items-stretch"
+      >
+        <div 
+          className="w-32 h-full bg-sand-100 relative flex-shrink-0 cursor-pointer overflow-hidden"
+          onClick={handleImageClick}
+        >
+          {hasValidImage && currentImage ? (
+            <img
+              src={currentImage.url}
+              alt={plant.name || plant.identified_name}
+              className="w-full h-full object-cover transition-transform duration-500"
+              onError={handleImageError}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-sand-100 to-sand-200 p-2">
+              <div className="text-center">
+                <Leaf className="w-7 h-7 text-sand-500 mx-auto mb-1" />
+                <p className="text-[11px] text-sand-700 font-medium px-1 leading-tight">
+                  {plant.name || plant.identified_name || "Unknown"}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="p-3 bg-sand-50 flex flex-grow justify-between items-center min-h-[120px]">
+          <div className="flex flex-col justify-center flex-grow pr-4 w-0">
+            <h3 className="text-lg font-bold text-gray-800 leading-tight mb-2 break-words">
+              {plant.name || plant.identified_name || "Alternative Match"}
+            </h3>
+
+            <div className="mb-2 flex items-center w-full">
+              <span className="text-xs font-semibold text-gray-500 mr-2 flex-shrink-0">
+                Category:
+              </span>
+              <span
+                className={`bg-sand-200 ${textClass} px-3 py-0.5 rounded-full text-xs font-medium break-words`}
+              >
+                {plant.category || activeTab}
+              </span>
+            </div>
+
+            <div className="w-full">
+              <span className="text-xs text-gray-600 font-medium block mb-1">
+                Match Confidence
+              </span>
+              <div className="w-full bg-sand-300 rounded-full h-1.5">
+                <div
+                  className={`h-1.5 rounded-full transition-all duration-700 ${
+                    isMainResult ? "bg-green-600" : "bg-amber-500"
+                  }`}
+                  style={{ width: `${confidence * 100}%` }}
+                ></div>
+              </div>
             </div>
           </div>
-        )}
-      </div>
 
-      <div className="p-3 bg-sand-50 flex flex-grow justify-between items-center min-h-[120px]">
-        <div className="flex flex-col justify-center flex-grow pr-4">
-          <h3 className="text-lg font-bold text-gray-800 leading-tight mb-2 truncate">
-            {plant.name || plant.identified_name || "Alternative Match"}
-          </h3>
-
-          <div className="mb-2 flex items-center">
-            <span className="text-xs font-semibold text-gray-500 mr-2">
-              Category:
-            </span>
-            <span
-              className={`bg-sand-200 ${textClass} px-3 py-0.5 rounded-full text-xs font-medium`}
+          <div className="flex-shrink-0 self-center pl-4 border-l border-gray-100">
+            <div
+              className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl shadow-inner ${confidenceColorClass} transition-all duration-300`}
             >
-              {plant.category || activeTab}
-            </span>
-          </div>
-
-          <div>
-            <span className="text-xs text-gray-600 font-medium block mb-1">
-              Match Confidence
-            </span>
-            <div className="w-full bg-sand-300 rounded-full h-1.5">
-              <div
-                className={`h-1.5 rounded-full transition-all duration-700 ${
-                  isMainResult ? "bg-green-600" : "bg-amber-500"
-                }`}
-                style={{ width: `${confidence * 100}%` }}
-              ></div>
+              <span className="text-2xl font-extrabold text-white leading-none">
+                {(confidence * 100).toFixed(0)}
+              </span>
+              <span className="text-xs font-semibold text-green-200 mt-0.5">
+                MATCH %
+              </span>
             </div>
           </div>
         </div>
+      </motion.div>
 
-        <div className="flex-shrink-0 self-center pl-4 border-l border-gray-100">
-          <div
-            className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl shadow-inner ${confidenceColorClass} transition-all duration-300 group-hover:scale-105`}
-          >
-            <span className="text-2xl font-extrabold text-white leading-none">
-              {(confidence * 100).toFixed(0)}
-            </span>
-            <span className="text-xs font-semibold text-green-200 mt-0.5">
-              MATCH %
-            </span>
-          </div>
-        </div>
-      </div>
-    </motion.div>
+      <ImageModal
+        isOpen={!!selectedImage}
+        imageUrl={selectedImage}
+        plantName={plant.name || plant.identified_name}
+        onClose={() => setSelectedImage(null)}
+      />
+    </>
   );
 };
 
@@ -452,7 +532,7 @@ const IdentificationPage = () => {
       console.log("Show search results state:", true);
       
       setSearchResults(searchData);
-      setShowSearchResults(true); // Ensure it's set again after data arrives
+      setShowSearchResults(true);
       
     } catch (error) {
       console.error("Search error:", error);
@@ -467,10 +547,9 @@ const IdentificationPage = () => {
     console.log("Selected search result:", result);
     setLoadingDetails(true);
     setShowSearchResults(false);
-    setSearchQuery(""); // Clear the search
+    setSearchQuery("");
     
     try {
-      // Use your existing OpenAI-based plant details endpoint
       console.log("Fetching plant details for:", result.name);
       
       const response = await fetch("/api/get-plant-details", {
@@ -488,13 +567,12 @@ const IdentificationPage = () => {
       const data = await response.json();
       console.log("Plant details received:", data);
       
-      // Create a result object similar to identification result
       const searchResult = {
         identified: true,
         identified_name: result.name,
         species: result.name,
         category: activeTab,
-        confidence: 1.0, // Search results are exact matches
+        confidence: 1.0,
         similar_images: result.thumbnail 
           ? [{ url: `data:image/jpeg;base64,${result.thumbnail}` }] 
           : [],
@@ -506,7 +584,6 @@ const IdentificationPage = () => {
       setResult(searchResult);
       sessionStorage.setItem('identificationResult', JSON.stringify(searchResult));
       
-      // Set the detailed plant information from OpenAI
       console.log("Setting plant details:", data.details);
       setPlantDetails(data.details);
       sessionStorage.setItem('plantDetails', JSON.stringify(data.details));
@@ -612,7 +689,6 @@ const IdentificationPage = () => {
             <h1 className="text-5xl font-extrabold text-gray-900 mb-4 animate-fade-in-down">
               AI Species Identifier
             </h1>
-            
           </header>
 
           <AnimatePresence>
